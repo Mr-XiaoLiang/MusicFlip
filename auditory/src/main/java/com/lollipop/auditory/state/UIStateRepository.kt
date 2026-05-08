@@ -31,17 +31,23 @@ object UIStateRepository {
     /**
      * 正在播放的歌曲的信息
      */
-    val playingInfo = playingInfoFlow.asStateFlow()
+    val playingInfo by lazy {
+        playingInfoFlow.asStateFlow()
+    }
 
     /**
      * 是否暗色模式
      */
-    val isDarkMode = darkModeFlow.asStateFlow()
+    val isDarkMode by lazy {
+        darkModeFlow.asStateFlow()
+    }
 
     /**
      * 正在播放的歌曲的主题色
      */
-    val playingTheme = playingThemeFlow.asStateFlow()
+    val playingTheme by lazy {
+        playingThemeFlow.asStateFlow()
+    }
 
     private fun onAudioChange(): Long {
         audioChangeCount++

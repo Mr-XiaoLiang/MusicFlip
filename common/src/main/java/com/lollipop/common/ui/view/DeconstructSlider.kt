@@ -21,9 +21,10 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.core.content.withStyledAttributes
 import com.lollipop.common.R
+import com.lollipop.common.tools.LLog.Companion.registerLog
 import kotlin.math.absoluteValue
 
-class DeconstructSlider(
+class DeconstructSlider @JvmOverloads constructor(
     context: Context,
     attr: AttributeSet? = null
 ) : View(context, attr) {
@@ -45,6 +46,10 @@ class DeconstructSlider(
     var progress = 0F
         private set
     private var touchSlop = 0
+
+    private val log by lazy {
+        registerLog()
+    }
 
     init {
         background = deconstructProgress
@@ -219,8 +224,10 @@ class DeconstructSlider(
                 viewParent.registerPenetrate(this)
                 return
             }
-            if (viewParent is View) {
-                viewParent = viewParent.parent
+            viewParent = if (viewParent is View) {
+                viewParent.parent
+            } else {
+                null
             }
         }
     }

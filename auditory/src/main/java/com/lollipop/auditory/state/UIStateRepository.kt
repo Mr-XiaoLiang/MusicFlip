@@ -21,9 +21,15 @@ object UIStateRepository {
         registerLog()
     }
 
-    private val playingInfoFlow = MutableStateFlow(AudioInfo.EMPTY)
-    private val darkModeFlow = MutableStateFlow(false)
-    private val playingThemeFlow = MutableStateFlow(DefaultDarkColorScheme)
+    private val playingInfoFlow by lazy {
+        MutableStateFlow(AudioInfo.EMPTY)
+    }
+    private val darkModeFlow by lazy {
+        MutableStateFlow(false)
+    }
+    private val playingThemeFlow by lazy {
+        MutableStateFlow(DefaultDarkColorScheme)
+    }
     private var playingPalette: Palette? = null
 
     private var audioChangeCount = 0L

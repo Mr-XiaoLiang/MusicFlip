@@ -11,9 +11,13 @@ import kotlinx.coroutines.withContext
 
 object AudioRepository {
 
-    private val audioListFlow = MutableStateFlow<List<AudioInfo>>(emptyList())
+    private val audioListFlow by lazy {
+        MutableStateFlow<List<AudioInfo>>(emptyList())
+    }
 
-    private val stateFlow = MutableStateFlow<State>(State.IDLE)
+    private val stateFlow by lazy {
+        MutableStateFlow<State>(State.IDLE)
+    }
 
     val audioList by lazy {
         audioListFlow.asStateFlow()

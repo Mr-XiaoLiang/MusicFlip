@@ -22,9 +22,11 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <include layout="@layout/fragment_player_full" />
+        <include layout="@layout/fragment_player_full"
+            android:id="@+id/playerFullPanel"/>
 
-        <include layout="@layout/fragment_player_mini" />
+        <include layout="@layout/fragment_player_mini"
+            android:id="@+id/playerMiniPanel"/>
 
     </FrameLayout>
 

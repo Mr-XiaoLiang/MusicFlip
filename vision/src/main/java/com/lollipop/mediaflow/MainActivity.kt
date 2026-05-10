@@ -306,7 +306,6 @@ class MainActivity : BasicInsetsActivity(), BasicMediaGridPage.Callback,
         }
         registerGuidelineInsetsListener(contentInsetsHelper)
         contentInsetsHelper.bindGuidelineInsets(
-            context = this,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,

@@ -12,7 +12,8 @@
         <FrameLayout
             android:id="@+id/contentView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="#30F0" />
     </eightbitlab.com.blurview.BlurTarget>
 
     <!-- 固定底部的播放控制页 -->
@@ -22,11 +23,13 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-        <include layout="@layout/fragment_player_full"
-            android:id="@+id/playerFullPanel"/>
+        <include
+            android:id="@+id/playerFullPanel"
+            layout="@layout/fragment_player_full" />
 
-        <include layout="@layout/fragment_player_mini"
-            android:id="@+id/playerMiniPanel"/>
+        <include
+            android:id="@+id/playerMiniPanel"
+            layout="@layout/fragment_player_mini" />
 
     </FrameLayout>
 

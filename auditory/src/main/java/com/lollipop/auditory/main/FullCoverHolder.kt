@@ -3,16 +3,16 @@ package com.lollipop.auditory.main
 import android.annotation.SuppressLint
 import com.lollipop.auditory.data.AudioInfo
 import com.lollipop.auditory.databinding.ItemPlaySongBinding
-import com.lollipop.auditory.ui.view.CoverViewPagerAdapter
+import com.lollipop.auditory.main.basic.BasicCoverHolder
 import com.lollipop.common.ui.page.GuidelineInsetsHelper
 
-class AudioCoverHolder(
+class FullCoverHolder(
     private val binding: ItemPlaySongBinding
-) : CoverViewPagerAdapter.ViewHolder(binding.root) {
+) : BasicCoverHolder(binding.root) {
 
-    val guidelineInsetsHelper = GuidelineInsetsHelper().also {
-        it.bindGuidelineInsets(
-            context = binding.root.context,
+    override fun updateEdgeSize(edgeSize: GuidelineInsetsHelper.EdgeSize) {
+        GuidelineInsetsHelper.update(
+            edgeSize = edgeSize,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,
@@ -21,7 +21,7 @@ class AudioCoverHolder(
     }
 
     @SuppressLint("SetTextI18n")
-    fun bind(audioInfo: AudioInfo, allCount: Int, position: Int) {
+    override fun bind(audioInfo: AudioInfo, allCount: Int, position: Int) {
         binding.titleTextView.text = audioInfo.title
         binding.pageNumberView.text = "${position + 1}/$allCount"
     }

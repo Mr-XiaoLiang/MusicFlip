@@ -1,4 +1,4 @@
-package com.lollipop.auditory.main
+package com.lollipop.auditory.main.basic
 
 import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
@@ -12,9 +12,7 @@ abstract class BasicSheetPanel {
     open fun onCreate() {
     }
 
-    protected open fun onGuidelineInsetsChanged(
-        left: Int, top: Int, right: Int, bottom: Int
-    ) {
+    protected open fun onGuidelineInsetsChanged(edgeSize: GuidelineInsetsHelper.EdgeSize) {
     }
 
     open fun onSlide(offset: Float) {

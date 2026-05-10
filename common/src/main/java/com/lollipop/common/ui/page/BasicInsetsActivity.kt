@@ -3,14 +3,11 @@ package com.lollipop.common.ui.page
 import android.graphics.Rect
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updateLayoutParams
 import com.lollipop.common.tools.LLog.Companion.registerLog
-import kotlin.math.max
 
 abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provider {
 
@@ -21,6 +18,10 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
     protected val insetsProviderHelper = InsetsFragment.ProviderHelper()
 
     private val guidelineInsetsGroup = GuidelineInsetsGroup()
+
+    protected open val checkSystemBarsInsets = true
+    protected open val checkDisplayCutoutInsets = true
+    protected open val checkSystemGesturesInsets = false
 
     protected var insetsCache = Insets.NONE
         private set
@@ -39,17 +40,44 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
         guidelineInsetsGroup.unregister(helper)
     }
 
+    private fun findInsets(insets: WindowInsetsCompat): Insets {
+        val systemBars = if (checkSystemBarsInsets) {
+            insets.getInsets(WindowInsetsCompat.Type.systemBars())
+        } else {
+            Insets.NONE
+        }
+        val displayCutout = if (checkDisplayCutoutInsets) {
+            insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+        } else {
+            Insets.NONE
+        }
+        val systemGestures = if (checkSystemGesturesInsets) {
+            insets.getInsets(WindowInsetsCompat.Type.systemGestures())
+        } else {
+            Insets.NONE
+        }
+
+        return Insets.of(
+            max(systemBars.left, displayCutout.left, systemGestures.left),
+            max(systemBars.top, displayCutout.top, systemGestures.top),
+            max(systemBars.right, displayCutout.right, systemGestures.right),
+            max(systemBars.bottom, displayCutout.bottom, systemGestures.bottom)
+        )
+    }
+
+    private fun max(vararg values: Int): Int {
+        var max = values[0]
+        for (i in 1 until values.size) {
+            if (values[i] > max) {
+                max = values[i]
+            }
+        }
+        return max
+    }
+
     protected fun initInsetsListener(rootView: View) {
         ViewCompat.setOnApplyWindowInsetsListener(rootView) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val displayCutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
-            val finallyInsets = Insets.of(
-                max(systemBars.left, displayCutout.left),
-                max(systemBars.top, displayCutout.top),
-                max(systemBars.right, displayCutout.right),
-                max(systemBars.bottom, displayCutout.bottom)
-            )
-            insetsCache = finallyInsets
+            insetsCache = findInsets(insets)
             insetsProviderHelper.updateInsets(
                 insetsCache.left,
                 insetsCache.top,

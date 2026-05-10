@@ -170,7 +170,6 @@ class ArchiveActivity : CustomOrientationActivity() {
         initInsetsListener(binding.root)
         registerGuidelineInsetsListener(guidelineInsetsHelper)
         guidelineInsetsHelper.bindGuidelineInsets(
-            context = this,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,

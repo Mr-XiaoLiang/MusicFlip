@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import java.util.LinkedList
 import androidx.core.util.size
+import com.lollipop.auditory.data.AudioInfo
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
 
 abstract class CoverViewPagerAdapter<VH : CoverViewPagerAdapter.ViewHolder> : PagerAdapter() {
 
@@ -65,11 +67,20 @@ abstract class CoverViewPagerAdapter<VH : CoverViewPagerAdapter.ViewHolder> : Pa
         }
     }
 
+    fun updateEdgeSize(edgeSize: GuidelineInsetsHelper.EdgeSize) {
+        forEachActive {
+            it.updateEdgeSize(edgeSize)
+        }
+    }
+
     abstract fun createViewHolder(container: ViewGroup): VH
 
     abstract fun bindViewHolder(holder: VH, position: Int)
 
     abstract class ViewHolder(val pageView: View) {
+
+        abstract fun updateEdgeSize(edgeSize: GuidelineInsetsHelper.EdgeSize)
+
     }
 
 }

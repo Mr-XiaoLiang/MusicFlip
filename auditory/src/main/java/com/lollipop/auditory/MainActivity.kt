@@ -4,16 +4,20 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,18 +39,23 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lollipop.auditory.base.AuditoryBasicActivity
 import com.lollipop.auditory.data.AudioInfo
 import com.lollipop.auditory.databinding.ActivityMainBinding
-import com.lollipop.auditory.main.BasicSheetPanel
 import com.lollipop.auditory.main.FullScreenPlayerPanel
 import com.lollipop.auditory.main.MiniSheetPlayerPanel
+import com.lollipop.auditory.main.basic.BasicSheetPanel
 import com.lollipop.auditory.model.AudioViewModel
 import com.lollipop.auditory.model.LocalAudioViewModel
 import com.lollipop.auditory.model.ThemeViewModel
 import com.lollipop.auditory.ui.MediaFlowTheme
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.common.ui.view.BlurHelper
 import kotlinx.coroutines.launch
 
 class MainActivity : AuditoryBasicActivity() {
+
+    override val checkSystemGesturesInsets: Boolean = true
+    override val checkSystemBarsInsets: Boolean = true
+    override val checkDisplayCutoutInsets: Boolean = true
 
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -60,12 +69,19 @@ class MainActivity : AuditoryBasicActivity() {
         MiniSheetPlayerPanel(binding.playerMiniPanel)
     }
 
+    private val bottomSheetBackPressedDispatcher = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
     private val sheetPanel by lazy {
         SheetPanelGroup(
             arrayOf(
                 miniSheetPlayerPanel,
                 fullScreenPlayerPanel
-            )
+            ),
+            bottomSheetBackPressedDispatcher
         )
     }
 
@@ -79,6 +95,7 @@ class MainActivity : AuditoryBasicActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        initInsetsListener(binding.root)
         binding.contentView.addView(
             createContentView(),
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -114,6 +131,7 @@ class MainActivity : AuditoryBasicActivity() {
             onPlayerPeekHeightChangedPx(height)
         }
         bottomSheetBehavior.addBottomSheetCallback(sheetPanel.bottomSheetCallback)
+        onBackPressedDispatcher.addCallback(bottomSheetBackPressedDispatcher)
     }
 
     private fun onAudioInfoChanged(audioInfo: AudioInfo?) {
@@ -123,7 +141,7 @@ class MainActivity : AuditoryBasicActivity() {
 
     private fun onPlayerPeekHeightChangedPx(height: Int) {
         log.i("onPlayerPeekHeightChangedPx = $height")
-        themeModel.playerPeekHeight = height
+        themeModel.playerPeekHeight.value = height
         bottomSheetBehavior.peekHeight = height
     }
 
@@ -131,7 +149,7 @@ class MainActivity : AuditoryBasicActivity() {
         log.i("createContentView")
         return ComposeView(this).apply {
             setContent {
-                val playerPeekHeight = remember { themeModel.playerPeekHeight }
+                val playerPeekHeight by remember { themeModel.playerPeekHeight }
                 MediaFlowTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         val currentDensity = LocalDensity.current
@@ -166,14 +184,24 @@ class MainActivity : AuditoryBasicActivity() {
         val viewModel = LocalAudioViewModel.current // 获取ViewModel
         val songs by viewModel.songs.collectAsStateWithLifecycle() // 获取歌曲列表
         LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .background(Color(0xFF000000))
+            modifier = Modifier.fillMaxSize()
         ) {
-            items(songs, key = { it.id }) { song ->
-                Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Text(song.title)
+            item {
+                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+            }
+            items(100) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .background(Color(0x33FF0000), shape = MaterialTheme.shapes.large)
+                        .padding(16.dp)
+                ) {
+                    Text("Item - ${it + 1}")
                 }
+            }
+            item {
+                Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
             }
         }
     }
@@ -215,17 +243,20 @@ class MainActivity : AuditoryBasicActivity() {
     }
 
     private class SheetPanelGroup(
-        val panels: Array<BasicSheetPanel>
+        val panels: Array<BasicSheetPanel>,
+        val onBackPressedCallback: OnBackPressedCallback
     ) : BasicSheetPanel() {
 
         val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onStateChanged(view: View, newState: Int) {
                 when (newState) {
                     BottomSheetBehavior.STATE_EXPANDED -> {
+                        onBackPressedCallback.isEnabled = true
                         onExpand()
                     }
 
                     BottomSheetBehavior.STATE_COLLAPSED -> {
+                        onBackPressedCallback.isEnabled = false
                         onCollapse()
                     }
 
@@ -247,9 +278,9 @@ class MainActivity : AuditoryBasicActivity() {
         }
 
         override fun onGuidelineInsetsChanged(
-            left: Int, top: Int, right: Int, bottom: Int
+            edgeSize: GuidelineInsetsHelper.EdgeSize
         ) {
-            invoke { it.guidelineInsetsHelper.updateGuidelineInsets(left, top, right, bottom) }
+            invoke { it.guidelineInsetsHelper.dispatch(edgeSize) }
         }
 
         override fun onSlide(offset: Float) {

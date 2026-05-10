@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.CallSuper
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import com.lollipop.common.ui.page.CustomOrientationActivity
 import com.lollipop.common.ui.page.GuidelineInsetsHelper
+import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.common.ui.view.BlurHelper
 import com.lollipop.common.ui.view.SimpleGestureLayout
 import com.lollipop.mediaflow.R
@@ -123,7 +123,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         basicBinding.sidePanel.isVisible = isShow
         basicBinding.endGuideLine.updateLayoutParams<ConstraintLayout.LayoutParams> {
             guideEnd = if (isShow) {
-                contentInsetsHelper.minEdge
+                contentInsetsHelper.minEdge.right
             } else {
                 endGuideSize
             }
@@ -201,7 +201,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
     }
 
     protected fun updateFullscreen() {
-        if (isFullscreen || currentOrientation == Orientation.LANDSCAPE) {
+        if (isFullscreen || currentOrientation == PageOrientation.LANDSCAPE) {
             basicBinding.fullscreenBtn.setImageResource(R.drawable.fullscreen_exit_24)
             hideSystemUI()
         } else {
@@ -267,7 +267,6 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         initInsetsListener(basicBinding.root)
         registerGuidelineInsetsListener(contentInsetsHelper)
         contentInsetsHelper.bindGuidelineInsets(
-            context = this,
             leftGuideline = basicBinding.startGuideLine,
             topGuideline = basicBinding.topGuideLine,
             rightGuideline = basicBinding.endGuideLine,
@@ -276,7 +275,12 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         contentInsetsHelper.onFilter { insets ->
             endGuideSize = insets.right
             return@onFilter if (isSidePanelShown()) {
-                Insets.of(insets.left, insets.top, contentInsetsHelper.minEdge, insets.bottom)
+                GuidelineInsetsHelper.SimpleEdgeSize(
+                    insets.left,
+                    insets.top,
+                    contentInsetsHelper.minEdge.bottom,
+                    insets.bottom
+                )
             } else {
                 insets
             }
@@ -318,8 +322,8 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
 
         val orientation = pair(true)
 
-        fun update(o: Orientation) {
-            orientation.setVisible(o == Orientation.PORTRAIT)
+        fun update(o: PageOrientation) {
+            orientation.setVisible(o == PageOrientation.PORTRAIT)
         }
 
     }

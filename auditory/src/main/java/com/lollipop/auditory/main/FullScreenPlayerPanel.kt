@@ -8,14 +8,18 @@ import androidx.transition.TransitionManager
 import com.lollipop.auditory.R
 import com.lollipop.auditory.databinding.FragmentPlayerFullBinding
 import com.lollipop.auditory.databinding.ItemPlaySongBinding
+import com.lollipop.auditory.main.basic.BasicSheetPanel
 import com.lollipop.auditory.ui.view.CoverViewPagerAdapter
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
 
 class FullScreenPlayerPanel(
     val binding: FragmentPlayerFullBinding
 ) : BasicSheetPanel() {
 
-    private val coverViewPagerAdapter = CoverPagerAdapter(binding.root.context)
+    private val coverViewPagerAdapter = CoverPagerAdapter(binding.root.context) {
+        guidelineInsetsHelper.current
+    }
 
     private val landscapeConstraintSet by lazy {
         ConstraintSet().also {
@@ -31,7 +35,6 @@ class FullScreenPlayerPanel(
 
     override fun onCreate() {
         guidelineInsetsHelper.bindGuidelineInsets(
-            context = binding.root.context,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,
@@ -40,12 +43,9 @@ class FullScreenPlayerPanel(
         binding.coverViewPager.adapter = coverViewPagerAdapter
     }
 
-    override fun onGuidelineInsetsChanged(
-        left: Int, top: Int, right: Int, bottom: Int
-    ) {
-        coverViewPagerAdapter.forEachActive {
-            it.guidelineInsetsHelper.updateGuidelineInsets(left, top, right, bottom)
-        }
+    override fun onGuidelineInsetsChanged(edgeSize: GuidelineInsetsHelper.EdgeSize) {
+        super.onGuidelineInsetsChanged(edgeSize)
+        coverViewPagerAdapter.updateEdgeSize(edgeSize)
     }
 
     override fun onOrientationChanged(orientation: PageOrientation) {
@@ -62,22 +62,24 @@ class FullScreenPlayerPanel(
     }
 
     private class CoverPagerAdapter(
-        context: Context
-    ) : CoverViewPagerAdapter<AudioCoverHolder>() {
+        context: Context,
+        val edgeSizeProvider: () -> GuidelineInsetsHelper.EdgeSize
+    ) : CoverViewPagerAdapter<FullCoverHolder>() {
         private val layoutInflater = LayoutInflater.from(context)
 
         override fun getCount(): Int {
             return 20
         }
 
-        override fun createViewHolder(container: ViewGroup): AudioCoverHolder {
-            return AudioCoverHolder(ItemPlaySongBinding.inflate(layoutInflater))
+        override fun createViewHolder(container: ViewGroup): FullCoverHolder {
+            return FullCoverHolder(ItemPlaySongBinding.inflate(layoutInflater))
         }
 
         override fun bindViewHolder(
-            holder: AudioCoverHolder,
+            holder: FullCoverHolder,
             position: Int
         ) {
+            holder.updateEdgeSize(edgeSizeProvider())
             holder.testBind("Holder $position", "${position + 1}/${getCount()}")
         }
 

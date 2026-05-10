@@ -1,8 +1,6 @@
 package com.lollipop.auditory.model
 
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lollipop.auditory.data.AudioInfo
@@ -25,6 +23,6 @@ class ThemeViewModel : ViewModel() {
      * 单位为px
      * 默认值为0，表示被隐藏了，其实这是不可能的
      */
-    var playerPeekHeight by mutableIntStateOf(0)
+    val playerPeekHeight = mutableIntStateOf(0)
 
 }

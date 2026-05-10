@@ -35,11 +35,14 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.lollipop.auditory.base.AuditoryBasicActivity
 import com.lollipop.auditory.data.AudioInfo
 import com.lollipop.auditory.databinding.ActivityMainBinding
+import com.lollipop.auditory.main.BasicSheetPanel
 import com.lollipop.auditory.main.FullScreenPlayerPanel
+import com.lollipop.auditory.main.MiniSheetPlayerPanel
 import com.lollipop.auditory.model.AudioViewModel
 import com.lollipop.auditory.model.LocalAudioViewModel
 import com.lollipop.auditory.model.ThemeViewModel
 import com.lollipop.auditory.ui.MediaFlowTheme
+import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.common.ui.view.BlurHelper
 import kotlinx.coroutines.launch
 
@@ -48,8 +51,22 @@ class MainActivity : AuditoryBasicActivity() {
     private val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
+
     private val fullScreenPlayerPanel by lazy {
         FullScreenPlayerPanel(binding.playerFullPanel)
+    }
+
+    private val miniSheetPlayerPanel by lazy {
+        MiniSheetPlayerPanel(binding.playerMiniPanel)
+    }
+
+    private val sheetPanel by lazy {
+        SheetPanelGroup(
+            arrayOf(
+                miniSheetPlayerPanel,
+                fullScreenPlayerPanel
+            )
+        )
     }
 
     private val themeModel: ThemeViewModel by viewModels()
@@ -68,13 +85,18 @@ class MainActivity : AuditoryBasicActivity() {
             ViewGroup.LayoutParams.MATCH_PARENT
         )
         log.i("onCreate")
+        registerInsets()
         rememberState()
         updateBlur()
-        fullScreenPlayerPanel.onCreate()
+        sheetPanel.onCreate()
         if (audioModel.songs.value.isEmpty()) {
             log.i("onCreate.refresh")
             audioModel.refresh(this)
         }
+    }
+
+    private fun registerInsets() {
+        registerGuidelineInsetsListener(sheetPanel.guidelineInsetsHelper)
     }
 
     private fun rememberState() {
@@ -87,6 +109,11 @@ class MainActivity : AuditoryBasicActivity() {
                 }
             }
         }
+
+        miniSheetPlayerPanel.onSizeChanged { _, height ->
+            onPlayerPeekHeightChangedPx(height)
+        }
+        bottomSheetBehavior.addBottomSheetCallback(sheetPanel.bottomSheetCallback)
     }
 
     private fun onAudioInfoChanged(audioInfo: AudioInfo?) {
@@ -139,7 +166,9 @@ class MainActivity : AuditoryBasicActivity() {
         val viewModel = LocalAudioViewModel.current // 获取ViewModel
         val songs by viewModel.songs.collectAsStateWithLifecycle() // 获取歌曲列表
         LazyColumn(
-            modifier = Modifier.padding(innerPadding).background(Color(0xFF000000))
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(Color(0xFF000000))
         ) {
             items(songs, key = { it.id }) { song ->
                 Row(modifier = Modifier.padding(horizontal = 16.dp)) {
@@ -159,17 +188,22 @@ class MainActivity : AuditoryBasicActivity() {
 
     override fun onResume() {
         super.onResume()
-        fullScreenPlayerPanel.onResume()
+        sheetPanel.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        fullScreenPlayerPanel.onPause()
+        sheetPanel.onPause()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateBlur()
+    }
+
+    override fun onOrientationChanged(orientation: PageOrientation) {
+        super.onOrientationChanged(orientation)
+        sheetPanel.onOrientationChanged(orientation)
     }
 
     override fun onWindowInsetsChanged(
@@ -178,7 +212,70 @@ class MainActivity : AuditoryBasicActivity() {
         right: Int,
         bottom: Int
     ) {
-        // TODO("Not yet implemented")
+    }
+
+    private class SheetPanelGroup(
+        val panels: Array<BasicSheetPanel>
+    ) : BasicSheetPanel() {
+
+        val bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onStateChanged(view: View, newState: Int) {
+                when (newState) {
+                    BottomSheetBehavior.STATE_EXPANDED -> {
+                        onExpand()
+                    }
+
+                    BottomSheetBehavior.STATE_COLLAPSED -> {
+                        onCollapse()
+                    }
+
+                    else -> {}
+                }
+            }
+
+            override fun onSlide(view: View, offset: Float) {
+                onSlide(offset)
+            }
+        }
+
+        private fun invoke(block: (BasicSheetPanel) -> Unit) {
+            panels.forEach(block)
+        }
+
+        override fun onCreate() {
+            invoke { it.onCreate() }
+        }
+
+        override fun onGuidelineInsetsChanged(
+            left: Int, top: Int, right: Int, bottom: Int
+        ) {
+            invoke { it.guidelineInsetsHelper.updateGuidelineInsets(left, top, right, bottom) }
+        }
+
+        override fun onSlide(offset: Float) {
+            invoke { it.onSlide(offset) }
+        }
+
+        override fun onExpand() {
+            invoke { it.onExpand() }
+        }
+
+        override fun onCollapse() {
+            invoke { it.onCollapse() }
+        }
+
+        override fun onResume() {
+            invoke { it.onResume() }
+        }
+
+        override fun onPause() {
+            invoke { it.onPause() }
+        }
+
+        override fun onOrientationChanged(orientation: PageOrientation) {
+            invoke { it.onOrientationChanged(orientation) }
+        }
+
     }
 
 }

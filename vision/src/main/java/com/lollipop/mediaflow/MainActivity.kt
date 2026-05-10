@@ -14,6 +14,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.lollipop.common.ui.page.BasicInsetsActivity
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
+import com.lollipop.common.ui.view.BlurHelper
+import com.lollipop.common.ui.view.IconPopupMenu
+import com.lollipop.common.upgrade.GithubApiModel
+import com.lollipop.common.upgrade.hasUpdate
 import com.lollipop.mediaflow.data.MediaDirectoryTree
 import com.lollipop.mediaflow.data.MediaInfo
 import com.lollipop.mediaflow.data.MediaSort
@@ -29,13 +35,8 @@ import com.lollipop.mediaflow.page.tools.VideoDuplicateFinderActivity
 import com.lollipop.mediaflow.tools.MediaIndex
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
 import com.lollipop.mediaflow.tools.PrivacyLock
-import com.lollipop.common.ui.page.BasicInsetsActivity
-import com.lollipop.common.ui.view.BlurHelper
-import com.lollipop.common.ui.view.IconPopupMenu
 import com.lollipop.mediaflow.ui.DirectoryChooseDialog
 import com.lollipop.mediaflow.ui.HomePage
-import com.lollipop.common.upgrade.GithubApiModel
-import com.lollipop.common.upgrade.hasUpdate
 import kotlinx.coroutines.launch
 
 class MainActivity : BasicInsetsActivity(), BasicMediaGridPage.Callback,
@@ -85,6 +86,8 @@ class MainActivity : BasicInsetsActivity(), BasicMediaGridPage.Callback,
             }
         }
     }
+
+    private val contentInsetsHelper = GuidelineInsetsHelper()
 
     private val dataChangedListener by lazy {
         MediaStore.createListener(this, ::onDataChanged)
@@ -301,7 +304,9 @@ class MainActivity : BasicInsetsActivity(), BasicMediaGridPage.Callback,
                 bottom = binding.viewPager2.bottom - binding.tabBar.top
             )
         }
-        bindGuidelineInsets(
+        registerGuidelineInsetsListener(contentInsetsHelper)
+        contentInsetsHelper.bindGuidelineInsets(
+            context = this,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,

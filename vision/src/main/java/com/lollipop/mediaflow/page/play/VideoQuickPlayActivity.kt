@@ -16,6 +16,7 @@ import com.lollipop.mediaflow.page.flow.VideoPlayHolder
 import com.lollipop.mediaflow.tools.Preferences
 import com.lollipop.common.ui.view.BlurHelper
 import com.lollipop.common.ui.page.CustomOrientationActivity
+import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.mediaflow.ui.PreferenceVisibleFilter
 import com.lollipop.mediaflow.video.VideoManager
 import kotlinx.coroutines.launch
@@ -133,7 +134,7 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
         return videoHolder.itemView
     }
 
-    override fun onOrientationChanged(orientation: Orientation) {
+    override fun onOrientationChanged(orientation: PageOrientation) {
         super.onOrientationChanged(orientation)
         videoHolder.resetScaleGesture()
     }

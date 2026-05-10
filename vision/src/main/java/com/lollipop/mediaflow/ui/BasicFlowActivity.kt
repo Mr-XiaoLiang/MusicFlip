@@ -12,13 +12,14 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import com.lollipop.common.ui.page.CustomOrientationActivity
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.view.BlurHelper
+import com.lollipop.common.ui.view.SimpleGestureLayout
 import com.lollipop.mediaflow.R
 import com.lollipop.mediaflow.data.MediaInfo
 import com.lollipop.mediaflow.databinding.ActivityFlowBinding
 import com.lollipop.mediaflow.page.flow.FlowSidePanelDelegate
 import com.lollipop.mediaflow.tools.Preferences
-import com.lollipop.common.ui.view.SimpleGestureLayout
 
 abstract class BasicFlowActivity : CustomOrientationActivity() {
 
@@ -72,6 +73,8 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         PreferenceVisibleFilter(basicBinding.tagGroup)
     }
 
+    private val contentInsetsHelper = GuidelineInsetsHelper()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -120,7 +123,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         basicBinding.sidePanel.isVisible = isShow
         basicBinding.endGuideLine.updateLayoutParams<ConstraintLayout.LayoutParams> {
             guideEnd = if (isShow) {
-                minEdge
+                contentInsetsHelper.minEdge
             } else {
                 endGuideSize
             }
@@ -161,14 +164,6 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
 
             else -> {}
         }
-    }
-
-    override fun filterGuidelineInsets(insets: Insets): Insets {
-        endGuideSize = insets.right
-        if (isSidePanelShown()) {
-            return Insets.of(insets.left, insets.top, minEdge, insets.bottom)
-        }
-        return super.filterGuidelineInsets(insets)
     }
 
     @CallSuper
@@ -270,12 +265,22 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
 
     private fun initInsetsListener() {
         initInsetsListener(basicBinding.root)
-        bindGuidelineInsets(
+        registerGuidelineInsetsListener(contentInsetsHelper)
+        contentInsetsHelper.bindGuidelineInsets(
+            context = this,
             leftGuideline = basicBinding.startGuideLine,
             topGuideline = basicBinding.topGuideLine,
             rightGuideline = basicBinding.endGuideLine,
             bottomGuideline = basicBinding.bottomGuideLine,
         )
+        contentInsetsHelper.onFilter { insets ->
+            endGuideSize = insets.right
+            return@onFilter if (isSidePanelShown()) {
+                Insets.of(insets.left, insets.top, contentInsetsHelper.minEdge, insets.bottom)
+            } else {
+                insets
+            }
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

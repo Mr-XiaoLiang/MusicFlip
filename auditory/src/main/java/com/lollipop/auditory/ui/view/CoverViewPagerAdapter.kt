@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.viewpager.widget.PagerAdapter
 import java.util.LinkedList
+import androidx.core.util.size
 
 abstract class CoverViewPagerAdapter<VH : CoverViewPagerAdapter.ViewHolder> : PagerAdapter() {
 
@@ -44,6 +45,17 @@ abstract class CoverViewPagerAdapter<VH : CoverViewPagerAdapter.ViewHolder> : Pa
             container.removeView(holder.pageView)
             @Suppress("UNCHECKED_CAST")
             holderCache.add(holder as VH)
+        }
+    }
+
+    fun findHolder(position: Int): VH? {
+        return activeHolders[position]
+    }
+
+    fun forEachActive(action: (VH) -> Unit) {
+        val size = activeHolders.size
+        for (i in 0 until size) {
+            action(activeHolders.valueAt(i))
         }
     }
 

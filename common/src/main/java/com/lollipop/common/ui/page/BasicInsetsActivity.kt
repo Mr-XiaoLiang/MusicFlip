@@ -1,7 +1,6 @@
 package com.lollipop.common.ui.page
 
 import android.graphics.Rect
-import android.util.TypedValue
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,13 +18,9 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
         registerLog()
     }
 
-    private var leftGuideline: View? = null
-    private var topGuideline: View? = null
-    private var rightGuideline: View? = null
-    private var bottomGuideline: View? = null
-    protected var minEdge: Int = 0
-
     protected val insetsProviderHelper = InsetsFragment.ProviderHelper()
+
+    private val guidelineInsetsGroup = GuidelineInsetsGroup()
 
     protected var insetsCache = Insets.NONE
         private set
@@ -34,6 +29,14 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
         WindowCompat.getInsetsController(window, window.decorView).also {
             it.isAppearanceLightStatusBars = isLight
         }
+    }
+
+    fun registerGuidelineInsetsListener(helper: GuidelineInsetsHelper) {
+        guidelineInsetsGroup.register(helper)
+    }
+
+    fun unregisterGuidelineInsetsListener(helper: GuidelineInsetsHelper) {
+        guidelineInsetsGroup.unregister(helper)
     }
 
     protected fun initInsetsListener(rootView: View) {
@@ -73,29 +76,6 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
         left: Int, top: Int, right: Int, bottom: Int
     )
 
-    protected open fun onGuidelineInsetsChanged(
-        left: Int, top: Int, right: Int, bottom: Int
-    ) {
-    }
-
-    protected fun bindGuidelineInsets(
-        leftGuideline: View,
-        topGuideline: View,
-        rightGuideline: View,
-        bottomGuideline: View,
-        minEdgeDp: Float = 16F
-    ) {
-        minEdge = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            minEdgeDp,
-            resources.displayMetrics
-        ).toInt()
-        this.leftGuideline = leftGuideline
-        this.topGuideline = topGuideline
-        this.rightGuideline = rightGuideline
-        this.bottomGuideline = bottomGuideline
-    }
-
     override fun getInsets(): Rect {
         return insetsProviderHelper.getInsets()
     }
@@ -108,56 +88,31 @@ abstract class BasicInsetsActivity : AppCompatActivity(), InsetsFragment.Provide
         insetsProviderHelper.unregisterInsetsListener(listener)
     }
 
-    protected open fun filterGuidelineInsets(insets: Insets): Insets {
-        return insets
-    }
-
     private fun updateGuidelineInsets(
         left: Int, top: Int, right: Int, bottom: Int
     ) {
         log.i("updateGuidelineInsets: $left, $top, $right, $bottom")
-        val guidelineInsets = filterGuidelineInsets(
-            Insets.of(
-                maxOf(left, minEdge),
-                maxOf(top, minEdge),
-                maxOf(right, minEdge),
-                maxOf(bottom, minEdge)
-            )
-        )
-        onGuidelineInsetsChanged(
-            guidelineInsets.left,
-            guidelineInsets.top,
-            guidelineInsets.right,
-            guidelineInsets.bottom
-        )
-        try {
-            leftGuideline?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                guideBegin = guidelineInsets.left
-            }
-        } catch (e: Throwable) {
-            log.e("updateGuidelineInsets: left", e)
+        guidelineInsetsGroup.updateGuidelineInsets(left, top, right, bottom)
+    }
+
+    protected class GuidelineInsetsGroup {
+
+        private val insetsListener = mutableListOf<GuidelineInsetsHelper>()
+
+        fun register(helper: GuidelineInsetsHelper) {
+            insetsListener.add(helper)
         }
-        try {
-            topGuideline?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                guideBegin = guidelineInsets.top
-            }
-        } catch (e: Throwable) {
-            log.e("updateGuidelineInsets: top", e)
+
+        fun unregister(helper: GuidelineInsetsHelper) {
+            insetsListener.remove(helper)
         }
-        try {
-            rightGuideline?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                guideEnd = guidelineInsets.right
-            }
-        } catch (e: Throwable) {
-            log.e("updateGuidelineInsets: right", e)
+
+        fun updateGuidelineInsets(
+            left: Int, top: Int, right: Int, bottom: Int
+        ) {
+            insetsListener.forEach { it.updateGuidelineInsets(left, top, right, bottom) }
         }
-        try {
-            bottomGuideline?.updateLayoutParams<ConstraintLayout.LayoutParams> {
-                guideEnd = guidelineInsets.bottom
-            }
-        } catch (e: Throwable) {
-            log.e("updateGuidelineInsets: bottom", e)
-        }
+
     }
 
 }

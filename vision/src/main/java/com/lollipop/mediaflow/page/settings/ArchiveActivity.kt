@@ -32,6 +32,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.bumptech.glide.Glide
+import com.lollipop.common.ui.page.CustomOrientationActivity
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
+import com.lollipop.common.ui.page.PageOrientation
+import com.lollipop.common.ui.view.BlurHelper
+import com.lollipop.common.ui.view.RatioFrameLayout
 import com.lollipop.mediaflow.R
 import com.lollipop.mediaflow.data.ArchiveBasket
 import com.lollipop.mediaflow.data.ArchiveManager
@@ -46,13 +51,10 @@ import com.lollipop.mediaflow.databinding.ItemMediaArchiveBinding
 import com.lollipop.mediaflow.page.archive.ArchiveSelectDialog
 import com.lollipop.mediaflow.tools.ArchiveHelper
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
-import com.lollipop.common.ui.view.BlurHelper
-import com.lollipop.common.ui.page.CustomOrientationActivity
 import com.lollipop.mediaflow.ui.dialog.ComposeHalfDialog
 import com.lollipop.mediaflow.ui.list.BasicListDelegate.BasicItemAdapter
 import com.lollipop.mediaflow.ui.list.MediaStaggered
 import com.lollipop.mediaflow.ui.theme.currentThemeColor
-import com.lollipop.common.ui.view.RatioFrameLayout
 import kotlinx.coroutines.Job
 
 
@@ -89,6 +91,8 @@ class ArchiveActivity : CustomOrientationActivity() {
     private val contentAdapter by lazy {
         MediaStaggered.buildLiningEdge(ItemAdapter(data = mediaData))
     }
+
+    private val guidelineInsetsHelper = GuidelineInsetsHelper()
 
     private var gallery: MediaStore.Gallery? = null
 
@@ -164,7 +168,9 @@ class ArchiveActivity : CustomOrientationActivity() {
 
     private fun initInsetsListener() {
         initInsetsListener(binding.root)
-        bindGuidelineInsets(
+        registerGuidelineInsetsListener(guidelineInsetsHelper)
+        guidelineInsetsHelper.bindGuidelineInsets(
+            context = this,
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,
@@ -172,7 +178,7 @@ class ArchiveActivity : CustomOrientationActivity() {
         )
     }
 
-    override fun onOrientationChanged(orientation: Orientation) {
+    override fun onOrientationChanged(orientation: PageOrientation) {
         super.onOrientationChanged(orientation)
         checkSpanCount()
     }
@@ -195,8 +201,8 @@ class ArchiveActivity : CustomOrientationActivity() {
         binding.recyclerView.setPadding(0, top, 0, 0)
         binding.archiveBar.setPadding(left, 0, right, bottom)
         val isRTL = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        val rightEdge = right.coerceAtLeast(minEdge) + actionSize
-        val leftEdge = left.coerceAtLeast(minEdge) + actionSize
+        val rightEdge = right.coerceAtLeast(guidelineInsetsHelper.minEdge) + actionSize
+        val leftEdge = left.coerceAtLeast(guidelineInsetsHelper.minEdge) + actionSize
         if (isRTL) {
             contentAdapter.startSpace.setSpacePx(rightEdge)
             contentAdapter.endSpace.setSpacePx(leftEdge)

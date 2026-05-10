@@ -10,18 +10,19 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.lollipop.common.tools.LLog.Companion.registerLog
+import com.lollipop.common.ui.page.PageOrientation
+import com.lollipop.common.ui.view.RatioFrameLayout
 import com.lollipop.mediaflow.data.MediaInfo
 import com.lollipop.mediaflow.data.MediaSort
 import com.lollipop.mediaflow.data.MediaStore
 import com.lollipop.mediaflow.data.MediaType
 import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.page.flow.MediaFlowStoreView
-import com.lollipop.common.tools.LLog.Companion.registerLog
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
 import com.lollipop.mediaflow.ui.BasicFlowActivity
 import com.lollipop.mediaflow.ui.PhotoFullPreviewDelegate
 import com.lollipop.mediaflow.ui.list.MediaGrid
-import com.lollipop.common.ui.view.RatioFrameLayout
 
 class PhotoFlowActivity : BasicFlowActivity() {
 
@@ -158,7 +159,7 @@ class PhotoFlowActivity : BasicFlowActivity() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onOrientationChanged(orientation: Orientation) {
+    override fun onOrientationChanged(orientation: PageOrientation) {
         super.onOrientationChanged(orientation)
         contentAdapter.content.notifyDataSetChanged()
     }

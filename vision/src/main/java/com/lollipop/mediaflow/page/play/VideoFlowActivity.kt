@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.lollipop.common.tools.safeRun
+import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.mediaflow.data.ArchiveQuick
 import com.lollipop.mediaflow.data.MediaInfo
 import com.lollipop.mediaflow.data.MediaSort
@@ -20,7 +22,6 @@ import com.lollipop.mediaflow.page.flow.MediaFlowStoreView
 import com.lollipop.mediaflow.page.flow.VideoPlayHolder
 import com.lollipop.mediaflow.tools.ArchiveHelper
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
-import com.lollipop.common.tools.safeRun
 import com.lollipop.mediaflow.ui.BasicFlowActivity
 import com.lollipop.mediaflow.video.VideoManager
 import kotlin.math.max
@@ -125,7 +126,7 @@ class VideoFlowActivity : BasicFlowActivity(), VideoPlayHolder.VideoTouchDisplay
         setCurrentItem(currentPosition, false)
     }
 
-    override fun onOrientationChanged(orientation: Orientation) {
+    override fun onOrientationChanged(orientation: PageOrientation) {
         super.onOrientationChanged(orientation)
         lastHolder?.resetScaleGesture()
     }

@@ -9,7 +9,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 
 abstract class CustomOrientationActivity : BasicInsetsActivity() {
 
-    protected var currentOrientation: Orientation = Orientation.PORTRAIT
+    protected var currentOrientation: PageOrientation = PageOrientation.PORTRAIT
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +25,9 @@ abstract class CustomOrientationActivity : BasicInsetsActivity() {
     private fun checkOrientation(configuration: Configuration) {
         val oldOrientation = currentOrientation
         currentOrientation = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Orientation.LANDSCAPE
+            PageOrientation.LANDSCAPE
         } else {
-            Orientation.PORTRAIT
+            PageOrientation.PORTRAIT
         }
         if (oldOrientation != currentOrientation) {
             onOrientationChanged(currentOrientation)
@@ -50,21 +50,16 @@ abstract class CustomOrientationActivity : BasicInsetsActivity() {
         }
     }
 
-    protected open fun onOrientationChanged(orientation: Orientation) {
+    protected open fun onOrientationChanged(orientation: PageOrientation) {
         when (orientation) {
-            Orientation.PORTRAIT -> {
+            PageOrientation.PORTRAIT -> {
                 showSystemUI()
             }
 
-            Orientation.LANDSCAPE -> {
+            PageOrientation.LANDSCAPE -> {
                 hideSystemUI()
             }
         }
-    }
-
-    protected enum class Orientation {
-        PORTRAIT,
-        LANDSCAPE
     }
 
 }

@@ -11,7 +11,7 @@ class AudioInfo(
     /**
      * 歌曲标题
      */
-    val title: String,
+    val audioTitle: String,
     /**
      * 歌手名
      */
@@ -55,7 +55,7 @@ class AudioInfo(
     /**
      * 显示名称
      */
-    val displayName: String,
+    val fileName: String,
     /**
      * 添加时间
      */
@@ -70,7 +70,9 @@ class AudioInfo(
     val year: Int
 ) {
 
-    val titleHash = title.hashCode()
+    val titleHash by lazy {
+        displayName.hashCode()
+    }
 
     /**
      * 歌曲的URI
@@ -85,14 +87,14 @@ class AudioInfo(
     /**
      * 歌曲名称，如果为空则使用显示名称
      */
-    val audioName: String by lazy {
-        title.ifBlank { displayName }
+    val displayName: String by lazy {
+        audioTitle.ifBlank { fileName }
     }
 
     companion object {
         val EMPTY = AudioInfo(
             id = 0,
-            title = "",
+            audioTitle = "",
             artist = "",
             artistId = 0,
             album = "",
@@ -102,7 +104,7 @@ class AudioInfo(
             size = 0,
             path = "",
             folderName = "",
-            displayName = "",
+            fileName = "",
             albumId = 0,
             dateAdded = 0,
             trackNumber = 0,

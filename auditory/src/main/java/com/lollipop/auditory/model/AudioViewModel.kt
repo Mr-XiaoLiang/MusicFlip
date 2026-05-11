@@ -41,8 +41,8 @@ class AudioViewModel : ViewModel() {
                 // 在计算线程进行排序，防止卡顿 UI
                 withContext(Dispatchers.Default) {
                     when (order) {
-                        SortOrder.Songs.BY_TITLE_ASC -> songs.sortedBy { it.audioName }
-                        SortOrder.Songs.BY_TITLE_DESC -> songs.sortedByDescending { it.audioName }
+                        SortOrder.Songs.BY_TITLE_ASC -> songs.sortedBy { it.displayName }
+                        SortOrder.Songs.BY_TITLE_DESC -> songs.sortedByDescending { it.displayName }
                         SortOrder.Songs.BY_DATE_ADDED_ASC -> songs.sortedBy { it.dateAdded }
                         SortOrder.Songs.BY_DATE_ADDED_DESC -> songs.sortedByDescending { it.dateAdded }
                         SortOrder.Songs.BY_ARTIST_ASC -> songs.sortedBy { it.artist }

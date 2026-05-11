@@ -22,7 +22,7 @@ class MiniCoverHolder(
 
     @SuppressLint("SetTextI18n")
     override fun bind(audioInfo: AudioInfo, allCount: Int, position: Int) {
-        binding.titleView.text = audioInfo.title
+        binding.titleView.text = audioInfo.displayName
     }
 
     fun testBind(title: String, pageNumber: String) {

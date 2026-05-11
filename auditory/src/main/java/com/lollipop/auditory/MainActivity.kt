@@ -5,34 +5,21 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -42,9 +29,12 @@ import com.lollipop.auditory.databinding.ActivityMainBinding
 import com.lollipop.auditory.main.FullScreenPlayerPanel
 import com.lollipop.auditory.main.MiniSheetPlayerPanel
 import com.lollipop.auditory.main.basic.BasicSheetPanel
-import com.lollipop.auditory.model.AudioViewModel
 import com.lollipop.auditory.model.LocalAudioViewModel
-import com.lollipop.auditory.model.ThemeViewModel
+import com.lollipop.auditory.model.ViewModelGroup
+import com.lollipop.auditory.page.MainPage
+import com.lollipop.auditory.page.PermissionPage
+import com.lollipop.auditory.tool.LocalPermissionLauncher
+import com.lollipop.auditory.tool.PermissionLauncher
 import com.lollipop.auditory.ui.MediaFlowTheme
 import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
@@ -69,6 +59,10 @@ class MainActivity : AuditoryBasicActivity() {
         MiniSheetPlayerPanel(binding.playerMiniPanel)
     }
 
+    private val permissionLauncher by lazy {
+        PermissionLauncher(this, ::onPermissionResult)
+    }
+
     private val bottomSheetBackPressedDispatcher = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
@@ -85,8 +79,7 @@ class MainActivity : AuditoryBasicActivity() {
         )
     }
 
-    private val themeModel: ThemeViewModel by viewModels()
-    private val audioModel: AudioViewModel by viewModels()
+    private val model = ViewModelGroup(this)
 
     private val bottomSheetBehavior by lazy {
         BottomSheetBehavior.from(binding.playerSheet)
@@ -106,9 +99,14 @@ class MainActivity : AuditoryBasicActivity() {
         rememberState()
         updateBlur()
         sheetPanel.onCreate()
-        if (audioModel.songs.value.isEmpty()) {
-            log.i("onCreate.refresh")
-            audioModel.refresh(this)
+        permissionLauncher.onCreate()
+    }
+
+    private fun onPermissionResult(isGranted: Boolean) {
+        log.i("onPermissionResult = $isGranted")
+        if (isGranted && model.audio.songs.value.isEmpty()) {
+            log.i("onPermissionResult.refresh")
+            model.audio.refresh(this)
         }
     }
 
@@ -121,7 +119,7 @@ class MainActivity : AuditoryBasicActivity() {
         // 观察数据变化
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                themeModel.playingInfo.collect { audioInfo ->
+                model.theme.playingInfo.collect { audioInfo ->
                     onAudioInfoChanged(audioInfo)
                 }
             }
@@ -141,7 +139,7 @@ class MainActivity : AuditoryBasicActivity() {
 
     private fun onPlayerPeekHeightChangedPx(height: Int) {
         log.i("onPlayerPeekHeightChangedPx = $height")
-        themeModel.playerPeekHeight.value = height
+        model.theme.playerPeekHeight.intValue = height
         bottomSheetBehavior.peekHeight = height
     }
 
@@ -149,7 +147,7 @@ class MainActivity : AuditoryBasicActivity() {
         log.i("createContentView")
         return ComposeView(this).apply {
             setContent {
-                val playerPeekHeight by remember { themeModel.playerPeekHeight }
+                val playerPeekHeight by remember { model.theme.playerPeekHeight }
                 MediaFlowTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         val currentDensity = LocalDensity.current
@@ -169,7 +167,10 @@ class MainActivity : AuditoryBasicActivity() {
                                 end = innerPadding.calculateEndPadding(currentDirection)
                             )
                         }
-                        CompositionLocalProvider(LocalAudioViewModel provides audioModel) {
+                        CompositionLocalProvider(
+                            LocalAudioViewModel provides model.audio,
+                            LocalPermissionLauncher provides permissionLauncher.delegate
+                        ) {
                             Content(finalPadding)
                         }
                     }
@@ -180,30 +181,12 @@ class MainActivity : AuditoryBasicActivity() {
 
     @Composable
     private fun Content(innerPadding: PaddingValues) {
-        // TODO("这里是 Compose 内容")
-        val viewModel = LocalAudioViewModel.current // 获取ViewModel
-        val songs by viewModel.songs.collectAsStateWithLifecycle() // 获取歌曲列表
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
-            }
-            items(100) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .background(Color(0x33FF0000), shape = MaterialTheme.shapes.large)
-                        .padding(16.dp)
-                ) {
-                    Text("Item - ${it + 1}")
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
-            }
+        val permissionState by LocalPermissionLauncher.current.isGranted
+        if (!permissionState) {
+            PermissionPage(innerPadding)
+            return
         }
+        MainPage(innerPadding)
     }
 
     private fun updateBlur() {
@@ -217,6 +200,7 @@ class MainActivity : AuditoryBasicActivity() {
     override fun onResume() {
         super.onResume()
         sheetPanel.onResume()
+        permissionLauncher.onResume()
     }
 
     override fun onPause() {

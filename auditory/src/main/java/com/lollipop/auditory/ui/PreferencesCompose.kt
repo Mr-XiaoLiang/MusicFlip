@@ -1,4 +1,4 @@
-package com.lollipop.mediaflow.ui
+package com.lollipop.auditory.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,14 +24,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lollipop.mediaflow.ui.theme.currentThemeColor
 
 
-fun LazyListScope.PreferencesGroupItem(
+fun LazyListScope.PreferencesGroupLazy(
     content: @Composable ColumnScope.() -> Unit
 ) {
     item {
-        PreferencesGroup(content)
+        PreferencesGroupCompose(content)
     }
 }
 
@@ -39,12 +38,19 @@ fun LazyListScope.PreferencesGroupItem(
 fun PreferencesGroup(
     content: @Composable ColumnScope.() -> Unit
 ) {
+    PreferencesGroupCompose(content)
+}
+
+@Composable
+private fun PreferencesGroupCompose(
+    content: @Composable ColumnScope.() -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp)
             .clip(MaterialTheme.shapes.large)
-            .background(color = currentThemeColor().preferencesGroup),
+            .background(color = MaterialTheme.colorScheme.surfaceContainer),
         content = content,
         horizontalAlignment = Alignment.CenterHorizontally
     )
@@ -78,13 +84,13 @@ fun PreferencesSwitch(
         ) {
             Text(
                 text = name,
-                color = currentThemeColor().buttonText,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 16.sp
             )
             Text(
                 text = summary,
-                color = currentThemeColor().buttonText,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 12.sp
             )
@@ -93,6 +99,32 @@ fun PreferencesSwitch(
         Switch(
             checked = isChecked,
             onCheckedChange = onCheckedChange,
+        )
+    }
+}
+
+@Composable
+fun PreferencesInfo(
+    title: String,
+    info: String,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 12.dp),
+        horizontalAlignment = Alignment.Start,
+    ) {
+        Text(
+            text = title,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 16.sp
+        )
+        Text(
+            text = info,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.fillMaxWidth(),
+            fontSize = 14.sp
         )
     }
 }
@@ -116,13 +148,13 @@ fun PreferencesIntent(
         ) {
             Text(
                 text = name,
-                color = currentThemeColor().buttonText,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 16.sp
             )
             Text(
                 text = summary,
-                color = currentThemeColor().buttonText,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 12.sp
             )
@@ -150,7 +182,7 @@ fun PreferencesSlide(
     ) {
         Text(
             text = name,
-            color = currentThemeColor().buttonText,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         Slider(

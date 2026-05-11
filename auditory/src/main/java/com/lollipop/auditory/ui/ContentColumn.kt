@@ -1,4 +1,4 @@
-package com.lollipop.mediaflow.ui
+package com.lollipop.auditory.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import com.lollipop.mediaflow.ui.theme.currentThemeColor
 
 
 @Composable
@@ -37,6 +36,7 @@ fun ContentColumn(
     content: LazyListScope.() -> Unit
 ) {
     val layoutDirection = LocalLayoutDirection.current
+//    val theme =
     Box(
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
@@ -46,47 +46,47 @@ fun ContentColumn(
             )
     ) {
         LazyColumn(
-            modifier = Modifier
+            modifier = Modifier.Companion
                 .fillMaxSize()
         ) {
             item {
-                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                Spacer(modifier = Modifier.Companion.height(innerPadding.calculateTopPadding()))
             }
             item {
-                Spacer(modifier = Modifier.height(64.dp))
+                Spacer(modifier = Modifier.Companion.height(64.dp))
             }
             content()
             item {
-                Spacer(modifier = Modifier.height(42.dp))
+                Spacer(modifier = Modifier.Companion.height(42.dp))
             }
             item {
-                Spacer(modifier = Modifier.height(innerPadding.calculateBottomPadding()))
+                Spacer(modifier = Modifier.Companion.height(innerPadding.calculateBottomPadding()))
             }
         }
         if (showBack) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.Companion.fillMaxSize()
             ) {
-                Spacer(modifier = Modifier.height(innerPadding.calculateTopPadding()))
+                Spacer(modifier = Modifier.Companion.height(innerPadding.calculateTopPadding()))
                 Card(
-                    modifier = Modifier.size(36.dp),
+                    modifier = Modifier.Companion.size(36.dp),
                     shape = CircleShape,
                     elevation = CardDefaults.cardElevation(defaultElevation = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = currentThemeColor().buttonBackground
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
                     )
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                         contentDescription = null,
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .size(36.dp)
                             .clip(CircleShape)
                             .clickable {
                                 onBack()
                             }
                             .padding(6.dp),
-                        tint = currentThemeColor().buttonText,
+                        tint = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }

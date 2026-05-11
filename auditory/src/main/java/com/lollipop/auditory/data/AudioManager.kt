@@ -5,8 +5,11 @@ import android.content.Context
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.MediaStore
+import com.lollipop.common.tools.LLog.Companion.registerLog
 
 object AudioManager {
+
+    private val log by lazy { registerLog() }
 
     enum class AudioColumn(val key: String) {
         ID(key = MediaStore.Audio.Media._ID),
@@ -32,6 +35,7 @@ object AudioManager {
     }
 
     fun loadSync(context: Context, limit: Int = 200, offset: Int = 0): List<AudioInfo> {
+        log.i("loadSync: limit=$limit, offset=$offset")
         val songList = mutableListOf<AudioInfo>()
         val contentResolver = context.contentResolver
 
@@ -64,7 +68,7 @@ object AudioManager {
                 songList.add(
                     AudioInfo(
                         id = audioCursor.getId(),
-                        title = audioCursor.getTitle(),
+                        audioTitle = audioCursor.getTitle(),
                         artist = audioCursor.getArtist(),
                         artistId = audioCursor.getArtistId(),
                         album = audioCursor.getAlbum(),
@@ -74,7 +78,7 @@ object AudioManager {
                         size = audioCursor.getSize(),
                         path = audioCursor.getPath(),
                         folderName = audioCursor.getFolderName(),
-                        displayName = audioCursor.getDisplayName(),
+                        fileName = audioCursor.getDisplayName(),
                         albumId = audioCursor.getAlbumId(),
                         dateAdded = audioCursor.getDateAdded(),
                         trackNumber = audioCursor.getTrack(),
@@ -83,6 +87,7 @@ object AudioManager {
                 )
             }
         }
+        log.i("loadSync: songList=${songList.size}")
         return songList
     }
 
@@ -173,21 +178,21 @@ object AudioManager {
             if (index < 0) {
                 return def
             }
-            return cursor.getString(index)
+            return cursor.getString(index) ?: def
         }
 
         private fun getLong(index: Int, def: Long): Long {
             if (index < 0) {
                 return def
             }
-            return cursor.getLong(index)
+            return cursor.getLong(index) ?: def
         }
 
         private fun getInt(index: Int, def: Int): Int {
             if (index < 0) {
                 return def
             }
-            return cursor.getInt(index)
+            return cursor.getInt(index) ?: def
         }
 
     }

@@ -22,7 +22,7 @@ class FullCoverHolder(
 
     @SuppressLint("SetTextI18n")
     override fun bind(audioInfo: AudioInfo, allCount: Int, position: Int) {
-        binding.titleTextView.text = audioInfo.title
+        binding.titleTextView.text = audioInfo.displayName
         binding.pageNumberView.text = "${position + 1}/$allCount"
     }
 

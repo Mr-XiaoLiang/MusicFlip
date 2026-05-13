@@ -9,7 +9,6 @@ import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.lollipop.common.tools.LLog.Companion.registerLog
 import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.common.ui.view.RatioFrameLayout
@@ -21,6 +20,7 @@ import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.page.flow.MediaFlowStoreView
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
 import com.lollipop.mediaflow.ui.BasicFlowActivity
+import com.lollipop.mediaflow.ui.CoverLoader
 import com.lollipop.mediaflow.ui.PhotoFullPreviewDelegate
 import com.lollipop.mediaflow.ui.list.MediaGrid
 
@@ -257,13 +257,19 @@ class PhotoFlowActivity : BasicFlowActivity() {
                 } else {
                     updateLayoutParams(1, 1)
                 }
+                imageView.post {
+                    CoverLoader.load(imageView, mediaInfo)
+                }
             }
-            Glide.with(imageView).load(mediaInfo.uri).into(imageView)
         }
 
         private fun updateLayoutParams(width: Int, height: Int) {
             log.i("updateLayoutParams, width=$width, height=$height")
-            root.setRatio(width, height, RatioFrameLayout.Mode.WidthFirst)
+            root.setRatio(
+                width.coerceAtLeast(1),
+                height.coerceAtLeast(1),
+                RatioFrameLayout.Mode.WidthFirst
+            )
         }
 
     }

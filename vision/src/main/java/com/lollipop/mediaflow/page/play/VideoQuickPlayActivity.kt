@@ -16,6 +16,7 @@ import com.lollipop.mediaflow.page.flow.VideoPlayHolder
 import com.lollipop.mediaflow.tools.Preferences
 import com.lollipop.common.ui.view.BlurHelper
 import com.lollipop.common.ui.page.CustomOrientationActivity
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
 import com.lollipop.mediaflow.ui.PreferenceVisibleFilter
 import com.lollipop.mediaflow.video.VideoManager
@@ -48,6 +49,8 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
     private val videoManager by lazy {
         VideoManager(this)
     }
+
+    private val guidelineInsetsHelper = GuidelineInsetsHelper()
 
     private var isDecorationShown = true
 
@@ -163,7 +166,8 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
 
     private fun initInsetsListener() {
         initInsetsListener(binding.root)
-        bindGuidelineInsets(
+        registerGuidelineInsetsListener(guidelineInsetsHelper)
+        guidelineInsetsHelper.bindGuidelineInsets(
             leftGuideline = binding.startGuideLine,
             topGuideline = binding.topGuideLine,
             rightGuideline = binding.endGuideLine,

@@ -278,7 +278,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
                 GuidelineInsetsHelper.SimpleEdgeSize(
                     insets.left,
                     insets.top,
-                    contentInsetsHelper.minEdge.bottom,
+                    contentInsetsHelper.minEdge.right,
                     insets.bottom
                 )
             } else {

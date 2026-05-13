@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.lollipop.mediaflow.data.MediaInfo
+import com.lollipop.mediaflow.data.MediaType
 import com.lollipop.mediaflow.databinding.ItemMediaGalleryBinding
+import com.lollipop.mediaflow.ui.CoverLoader
 
 class FlowSidePanelDelegate(
     val lifecycle: Lifecycle,
@@ -184,7 +186,7 @@ class FlowSidePanelDelegate(
         }
 
         fun bind(mediaInfo: MediaInfo, isSelected: Boolean) {
-            Glide.with(binding.imageView).load(mediaInfo.uri).into(binding.imageView)
+            CoverLoader.load(binding.imageView, mediaInfo)
             binding.flagView.isVisible = isSelected
         }
 

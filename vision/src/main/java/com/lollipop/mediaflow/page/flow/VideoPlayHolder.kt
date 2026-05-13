@@ -36,6 +36,7 @@ import com.lollipop.mediaflow.tools.Preferences
 import com.lollipop.mediaflow.tools.VideoTouchHelper
 import com.lollipop.common.tools.task
 import com.lollipop.common.ui.view.DeconstructSlider
+import com.lollipop.mediaflow.ui.CoverLoader
 import com.lollipop.mediaflow.video.VideoController
 import com.lollipop.mediaflow.video.VideoListener
 import com.lollipop.mediaflow.video.VideoTrackGroup
@@ -392,9 +393,7 @@ class VideoPlayHolder(
         clickHelper.reset()
         resetScaleGesture()
         if (isMediaChanged) {
-            Glide.with(itemView)
-                .load(media.uri)
-                .into(binding.artworkView)
+            CoverLoader.load(binding.artworkView, media)
             binding.artworkView.isVisible = true
             binding.playButton.isVisible = false
         }

@@ -51,6 +51,7 @@ import com.lollipop.mediaflow.databinding.ItemMediaArchiveBinding
 import com.lollipop.mediaflow.page.archive.ArchiveSelectDialog
 import com.lollipop.mediaflow.tools.ArchiveHelper
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
+import com.lollipop.mediaflow.ui.CoverLoader
 import com.lollipop.mediaflow.ui.dialog.ComposeHalfDialog
 import com.lollipop.mediaflow.ui.list.BasicListDelegate.BasicItemAdapter
 import com.lollipop.mediaflow.ui.list.MediaStaggered
@@ -200,8 +201,8 @@ class ArchiveActivity : CustomOrientationActivity() {
         binding.recyclerView.setPadding(0, top, 0, 0)
         binding.archiveBar.setPadding(left, 0, right, bottom)
         val isRTL = resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        val rightEdge = right.coerceAtLeast(guidelineInsetsHelper.minEdge) + actionSize
-        val leftEdge = left.coerceAtLeast(guidelineInsetsHelper.minEdge) + actionSize
+        val rightEdge = right.coerceAtLeast(guidelineInsetsHelper.minEdge.right) + actionSize
+        val leftEdge = left.coerceAtLeast(guidelineInsetsHelper.minEdge.left) + actionSize
         if (isRTL) {
             contentAdapter.startSpace.setSpacePx(rightEdge)
             contentAdapter.endSpace.setSpacePx(leftEdge)
@@ -240,9 +241,7 @@ class ArchiveActivity : CustomOrientationActivity() {
         private var loadingJob: Job? = null
 
         fun bind(mediaInfo: MediaInfo.File) {
-            Glide.with(itemView)
-                .load(mediaInfo.uri)
-                .into(binding.mediaPreview)
+            CoverLoader.load(binding.mediaPreview, mediaInfo)
             loadingJob?.cancel()
             loadingJob = MetadataLoader.load(itemView.context, mediaInfo) { metadata ->
                 if (metadata != null) {

@@ -18,6 +18,8 @@ import com.lollipop.mediaflow.data.MediaMetadata
 import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.databinding.ItemMediaStaggeredBinding
 import com.lollipop.common.ui.view.RatioFrameLayout
+import com.lollipop.mediaflow.data.MediaType
+import com.lollipop.mediaflow.ui.CoverLoader
 import kotlinx.coroutines.Job
 
 object MediaStaggered : BasicListDelegate() {
@@ -171,16 +173,10 @@ object MediaStaggered : BasicListDelegate() {
                 if (metadata != null) {
                     updateUI(metadata)
                     binding.mediaPreview.post {
-                        loadCover(mediaInfo.uri)
+                        CoverLoader.load(binding.mediaPreview, mediaInfo)
                     }
                 }
             }
-        }
-
-        private fun loadCover(uri: Uri) {
-            Glide.with(itemView)
-                .load(uri)
-                .into(binding.mediaPreview)
         }
 
         private fun updateUI(metadata: MediaMetadata?) {
@@ -191,8 +187,8 @@ object MediaStaggered : BasicListDelegate() {
             } else {
                 binding.durationView.isVisible = false
             }
-            val ratioWidth = metadata?.width ?: 1
-            var ratioHeight = metadata?.height ?: 1
+            val ratioWidth = (metadata?.width ?: 1).coerceAtLeast(1)
+            var ratioHeight = (metadata?.height ?: 1).coerceAtLeast(1)
             if (ratioHeight < ratioWidth) {
                 ratioHeight = ratioWidth
             }

@@ -21,7 +21,12 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
+    buildTypes {
+        // 创建名为 beta 的新构建模式
+        create("beta") {
+            initWith(getByName("release"))
+        }
+    }
 }
 
 dependencies {

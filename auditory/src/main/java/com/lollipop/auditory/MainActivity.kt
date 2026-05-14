@@ -23,6 +23,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.lollipop.auditory.audio.AudioControllerDelegate
+import com.lollipop.auditory.audio.LocalAudioController
 import com.lollipop.auditory.base.AuditoryBasicActivity
 import com.lollipop.auditory.data.AudioInfo
 import com.lollipop.auditory.databinding.ActivityMainBinding
@@ -67,6 +69,10 @@ class MainActivity : AuditoryBasicActivity() {
         override fun handleOnBackPressed() {
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
+    }
+
+    private val audioController by lazy {
+        AudioControllerDelegate(this)
     }
 
     private val sheetPanel by lazy {
@@ -169,7 +175,8 @@ class MainActivity : AuditoryBasicActivity() {
                         }
                         CompositionLocalProvider(
                             LocalAudioViewModel provides model.audio,
-                            LocalPermissionLauncher provides permissionLauncher.delegate
+                            LocalPermissionLauncher provides permissionLauncher.delegate,
+                            LocalAudioController provides audioController.controller
                         ) {
                             Content(finalPadding)
                         }
@@ -197,6 +204,11 @@ class MainActivity : AuditoryBasicActivity() {
         )
     }
 
+    override fun onStart() {
+        super.onStart()
+        audioController.onStart()
+    }
+
     override fun onResume() {
         super.onResume()
         sheetPanel.onResume()
@@ -206,6 +218,11 @@ class MainActivity : AuditoryBasicActivity() {
     override fun onPause() {
         super.onPause()
         sheetPanel.onPause()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        audioController.onStop()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

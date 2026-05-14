@@ -8,4 +8,6 @@
 
     <string name="label_request_permission_audio">授予权限</string>
     <string name="summary_request_permission_audio">当您点下此处，将会唤起系统的权限请求对话框。</string>
+
+    <string name="notification_channel_playback">音频播放的前台通知</string>
 </resources>

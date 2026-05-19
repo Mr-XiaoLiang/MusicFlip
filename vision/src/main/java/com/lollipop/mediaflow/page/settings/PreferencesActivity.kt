@@ -33,6 +33,7 @@ import com.lollipop.mediaflow.ui.PreferencesSlide
 import com.lollipop.mediaflow.ui.PreferencesSwitch
 import com.lollipop.mediaflow.ui.theme.currentThemeColor
 import com.lollipop.common.upgrade.GithubApiModel
+import com.lollipop.mediaflow.page.archive.ArchiveUriManagerActivity
 import kotlinx.coroutines.launch
 
 

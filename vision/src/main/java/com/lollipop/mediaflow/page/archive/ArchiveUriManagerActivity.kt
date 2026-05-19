@@ -1,4 +1,4 @@
-package com.lollipop.mediaflow.page.settings
+package com.lollipop.mediaflow.page.archive
 
 import android.content.Context
 import android.content.Intent
@@ -40,14 +40,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import com.lollipop.common.tools.LLog.Companion.registerLog
 import com.lollipop.mediaflow.MainActivity
 import com.lollipop.mediaflow.R
 import com.lollipop.mediaflow.data.ArchiveManager
 import com.lollipop.mediaflow.data.ArchiveQuick
 import com.lollipop.mediaflow.data.MediaChooser
-import com.lollipop.mediaflow.data.MediaChooser.MediaResult
 import com.lollipop.mediaflow.data.MediaLoader
-import com.lollipop.common.tools.LLog.Companion.registerLog
 import com.lollipop.mediaflow.ui.BasicComposeActivity
 import com.lollipop.mediaflow.ui.theme.currentThemeColor
 import kotlinx.coroutines.Dispatchers
@@ -79,7 +78,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
         reloadCache()
     }
 
-    private fun onChooseResult(result: MediaResult) {
+    private fun onChooseResult(result: MediaChooser.MediaResult) {
         result.remember(this)
         val resultUri = result.uri
         val uriPath = resultUri?.toString()
@@ -103,7 +102,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
 
     @Composable
     override fun Content(innerPadding: PaddingValues) {
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.Companion.fillMaxSize()) {
             ArchiveContent(innerPadding)
         }
     }
@@ -120,7 +119,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
         ) {
             item {
                 Column(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                 ) {
@@ -130,7 +129,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7F)
                     )
                 }
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.Companion.height(16.dp))
             }
             items(basketList) { info ->
                 val currentIcon = when (info.uriString) {
@@ -140,10 +139,10 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                     else -> ArchiveQuick.Other
                 }
                 Row(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.Companion.CenterVertically
                 ) {
                     DropdownQuickIcon(
                         current = currentIcon,
@@ -152,7 +151,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                         }
                     )
                     Column(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .weight(1F)
                             .padding(horizontal = 12.dp)
                     ) {
@@ -169,7 +168,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                     Icon(
                         imageVector = Icons.Rounded.Delete,
                         contentDescription = null,
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .size(48.dp)
                             .clip(MaterialTheme.shapes.medium)
                             .clickable {
@@ -178,17 +177,17 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                             .padding(12.dp)
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.Companion.height(4.dp))
                 HorizontalDivider(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.Companion.height(4.dp))
             }
             item {
                 Row(
-                    modifier = Modifier
+                    modifier = Modifier.Companion
                         .fillMaxWidth()
                         .padding(vertical = 12.dp),
                     horizontalArrangement = Arrangement.Center
@@ -218,7 +217,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
             Icon(
                 painter = painterResource(current.iconRes),
                 contentDescription = null,
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .size(48.dp)
                     .clip(MaterialTheme.shapes.medium)
                     .clickable {
@@ -249,7 +248,7 @@ class ArchiveUriManagerActivity : BasicComposeActivity() {
                             Icon(
                                 painter = painterResource(item.iconRes),
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.Companion.size(24.dp)
                             )
                         },
                         onClick = {

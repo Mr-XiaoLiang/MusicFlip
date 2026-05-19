@@ -55,13 +55,13 @@
             android:theme="@style/Theme.MediaFlow" />
 
         <activity
-            android:name=".page.settings.ArchiveActivity"
+            android:name=".page.archive.ArchiveActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
             android:theme="@style/Theme.MediaFlow" />
 
         <activity
-            android:name=".page.settings.ArchiveUriManagerActivity"
+            android:name=".page.archive.ArchiveUriManagerActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:exported="false"
             android:theme="@style/Theme.MediaFlow" />

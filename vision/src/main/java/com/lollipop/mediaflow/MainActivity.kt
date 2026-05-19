@@ -28,7 +28,7 @@ import com.lollipop.mediaflow.data.MediaType
 import com.lollipop.mediaflow.data.MediaVisibility
 import com.lollipop.mediaflow.databinding.ActivityMainBinding
 import com.lollipop.mediaflow.page.main.BasicMediaGridPage
-import com.lollipop.mediaflow.page.settings.ArchiveActivity
+import com.lollipop.mediaflow.page.archive.ArchiveActivity
 import com.lollipop.mediaflow.page.settings.PreferencesActivity
 import com.lollipop.mediaflow.page.settings.RootUriManagerActivity
 import com.lollipop.mediaflow.page.tools.VideoDuplicateFinderActivity

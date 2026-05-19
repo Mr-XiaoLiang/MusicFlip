@@ -1,4 +1,4 @@
-package com.lollipop.mediaflow.page.settings
+package com.lollipop.mediaflow.page.archive
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -31,7 +31,6 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.bumptech.glide.Glide
 import com.lollipop.common.ui.page.CustomOrientationActivity
 import com.lollipop.common.ui.page.GuidelineInsetsHelper
 import com.lollipop.common.ui.page.PageOrientation
@@ -48,26 +47,25 @@ import com.lollipop.mediaflow.data.MediaVisibility
 import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.databinding.ActivityArchiveBinding
 import com.lollipop.mediaflow.databinding.ItemMediaArchiveBinding
-import com.lollipop.mediaflow.page.archive.ArchiveSelectDialog
+import com.lollipop.mediaflow.page.archive.ArchiveUriManagerActivity
 import com.lollipop.mediaflow.tools.ArchiveHelper
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
 import com.lollipop.mediaflow.ui.CoverLoader
 import com.lollipop.mediaflow.ui.dialog.ComposeHalfDialog
-import com.lollipop.mediaflow.ui.list.BasicListDelegate.BasicItemAdapter
+import com.lollipop.mediaflow.ui.list.BasicListDelegate
 import com.lollipop.mediaflow.ui.list.MediaStaggered
 import com.lollipop.mediaflow.ui.theme.currentThemeColor
 import kotlinx.coroutines.Job
-
 
 class ArchiveActivity : CustomOrientationActivity() {
 
     companion object {
         fun start(context: Context, visibility: MediaVisibility, type: MediaType) {
             if (ArchiveManager.archiveBasketList.isEmpty()) {
-                ArchiveUriManagerActivity.start(context)
+                ArchiveUriManagerActivity.Companion.start(context)
                 return
             }
-            val intent = MediaPlayLauncher.createIntent(
+            val intent = MediaPlayLauncher.Companion.createIntent(
                 context = context,
                 visibility = visibility,
                 position = 0,
@@ -87,7 +85,7 @@ class ArchiveActivity : CustomOrientationActivity() {
         StaggeredGridLayoutManager(2, RecyclerView.HORIZONTAL)
     }
 
-    private val mediaParams = MediaPlayLauncher.params()
+    private val mediaParams = MediaPlayLauncher.Companion.params()
 
     private val contentAdapter by lazy {
         MediaStaggered.buildLiningEdge(ItemAdapter(data = mediaData))
@@ -139,7 +137,7 @@ class ArchiveActivity : CustomOrientationActivity() {
     private fun reloadData() {
         log.i("reloadData")
         val mediaVisibility = mediaParams.visibility
-        gallery = MediaStore.loadGallery(this, mediaVisibility, mediaParams.type)
+        gallery = MediaStore.Companion.loadGallery(this, mediaVisibility, mediaParams.type)
         gallery?.loadChoose { gallery, success ->
             val list = gallery.fileList
             onDataChanged(list)
@@ -220,7 +218,7 @@ class ArchiveActivity : CustomOrientationActivity() {
 
     private class ItemAdapter(
         data: List<MediaInfo.File>,
-    ) : BasicItemAdapter<MediaItemHolder>(data = data) {
+    ) : BasicListDelegate.BasicItemAdapter<MediaItemHolder>(data = data) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaItemHolder {
             return MediaItemHolder(
@@ -311,18 +309,18 @@ class ArchiveActivity : CustomOrientationActivity() {
             val historyList = remember { ArchiveManager.historyTaskList }
             val textColor = currentThemeColor().buttonText
             LazyColumn(
-                modifier = Modifier
+                modifier = Modifier.Companion
                     .fillMaxSize()
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.Companion.height(16.dp))
                 }
                 item {
                     Text(
                         text = stringResource(R.string.label_archive_running_task),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = FontFamily.Companion.Monospace,
                         fontSize = 12.sp,
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .padding(vertical = 8.dp, horizontal = 4.dp),
                         color = textColor
                     )
@@ -333,31 +331,31 @@ class ArchiveActivity : CustomOrientationActivity() {
                     key = { info -> info.sourceUri }
                 ) { info ->
                     Row(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Companion.CenterVertically
                     ) {
                         Text(
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = FontFamily.Companion.Monospace,
                             text = info.sourceName,
                             fontSize = 18.sp,
-                            modifier = Modifier
+                            modifier = Modifier.Companion
                                 .padding(vertical = 8.dp, horizontal = 4.dp),
                             color = textColor
                         )
                         HorizontalDivider(
-                            modifier = Modifier
+                            modifier = Modifier.Companion
                                 .weight(1F)
                                 .padding(horizontal = 12.dp)
                         )
                         if (info.progressState < 0) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.Companion.size(22.dp)
                             )
                         } else {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(22.dp),
+                                modifier = Modifier.Companion.size(22.dp),
                                 progress = { info.progressState }
                             )
                         }
@@ -367,9 +365,9 @@ class ArchiveActivity : CustomOrientationActivity() {
                 item {
                     Text(
                         text = stringResource(R.string.label_archive_history_task),
-                        fontFamily = FontFamily.Monospace,
+                        fontFamily = FontFamily.Companion.Monospace,
                         fontSize = 12.sp,
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .padding(vertical = 8.dp, horizontal = 4.dp),
                         color = textColor
                     )
@@ -380,16 +378,16 @@ class ArchiveActivity : CustomOrientationActivity() {
                     key = { info -> info.sourceUri }
                 ) { info ->
                     Row(
-                        modifier = Modifier
+                        modifier = Modifier.Companion
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.Companion.CenterVertically
                     ) {
                         Text(
-                            fontFamily = FontFamily.Monospace,
+                            fontFamily = FontFamily.Companion.Monospace,
                             text = info.sourceName,
                             fontSize = 18.sp,
-                            modifier = Modifier
+                            modifier = Modifier.Companion
                                 .padding(vertical = 8.dp, horizontal = 4.dp),
                             color = textColor
                         )
@@ -397,7 +395,7 @@ class ArchiveActivity : CustomOrientationActivity() {
                 }
 
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.Companion.height(16.dp))
                 }
             }
         }

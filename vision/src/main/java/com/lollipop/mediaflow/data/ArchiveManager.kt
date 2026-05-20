@@ -111,15 +111,41 @@ object ArchiveManager {
         saveConfig()
     }
 
-    suspend fun rename(resolver: ContentResolver, file: MediaInfo.File, newName: String) {
-        withContext(Dispatchers.IO) {
+    suspend fun rename(resolver: ContentResolver, file: MediaInfo.File, newName: String): Uri? {
+        return withContext(Dispatchers.IO) {
             runCatching {
                 DocumentsContract.renameDocument(
                     resolver,
                     file.uri,
                     newName
                 )
-            }.fallback("rename") { "" }
+            }.fallback("rename") { null }
+        }
+    }
+
+    suspend fun renameAndReanchored(
+        resolver: ContentResolver,
+        fileUri: Uri,
+        rootUri: Uri,
+        newName: String
+    ): Uri? {
+        return withContext(Dispatchers.IO) {
+            runCatching {
+                val movedUri = DocumentsContract.renameDocument(
+                    resolver,
+                    fileUri,
+                    newName
+                )
+                if (movedUri != null) {
+                    val movedDocId = DocumentsContract.getDocumentId(movedUri)
+                    return@withContext DocumentsContract.buildDocumentUriUsingTree(
+                        rootUri,
+                        movedDocId
+                    )
+                } else {
+                    return@withContext null
+                }
+            }.fallback("rename") { null }
         }
     }
 
@@ -420,6 +446,7 @@ object ArchiveManager {
             sourceName = sourceName,
             archiveDirectoryUri = archiveDirectoryUri,
             sourceParentUri = sourceParentUri,
+            sourceRootUri = mediaInfo.rootUri
         )
         if (initState.value == InitState.Loading) {
             pendingList.add(taskInfo)
@@ -457,18 +484,30 @@ object ArchiveManager {
 
             taskInfo.progressState = PROGRESS_INFINITE
             val targetName = createNewFileName(sourceName)
-            val moveDocumentResult = moveDocumentFile(
+
+            val renamedUri = renameAndReanchored(
                 resolver = resolver,
-                sourceFileUri = sourceUri,
-                sourceParentUri = sourceParentUri,
-                targetName = targetName,
-                targetDirectoryUri = archiveDirectoryUri
+                fileUri = sourceUri,
+                rootUri = taskInfo.sourceRootUri,
+                newName = targetName
             )
+
+            val moveDocumentResult = if (renamedUri != null) {
+                moveDocumentFile(
+                    resolver = resolver,
+                    sourceFileUri = renamedUri,
+                    sourceParentUri = sourceParentUri,
+                    targetName = targetName,
+                    targetDirectoryUri = archiveDirectoryUri
+                )
+            } else {
+                null
+            }
 
             if (moveDocumentResult == null) {
                 moveStreamFile(
                     resolver = resolver,
-                    sourceFileUri = sourceUri,
+                    sourceFileUri = renamedUri ?: sourceUri,
                     targetName = targetName,
                     targetDirectoryUri = archiveDirectoryUri,
                     onProgress = {
@@ -634,30 +673,11 @@ object ArchiveManager {
         return withContext(Dispatchers.IO) {
             runCatching {
                 // 假设你已经有了源文件的 URI、源父目录 URI 和回收站目录 URI
-                val movedUri = DocumentsContract.moveDocument(
+                DocumentsContract.moveDocument(
                     resolver,
                     sourceFileUri,
                     sourceParentUri,
                     targetDirectoryUri
-                )
-
-                if (movedUri == null) {
-                    return@runCatching null
-                }
-
-                // 从返回的 movedUri 中提取出它在 Provider 中的真实 DocumentId
-                val movedDocId = DocumentsContract.getDocumentId(movedUri)
-
-                // 这里的 rootTreeUriOfTarget 是你最初通过 ACTION_OPEN_DOCUMENT_TREE 获得的回收站根 URI
-                val reAnchoredUri = DocumentsContract.buildDocumentUriUsingTree(
-                    targetDirectoryUri,
-                    movedDocId
-                )
-
-                DocumentsContract.renameDocument(
-                    resolver,
-                    reAnchoredUri,
-                    targetName
                 )
             }.fallback("moveDocumentFile") { null }
         }
@@ -818,6 +838,7 @@ object ArchiveManager {
         val sourceName: String,
         val archiveDirectoryUri: Uri,
         val sourceParentUri: Uri,
+        val sourceRootUri: Uri
     ) {
 
         var progressState by mutableFloatStateOf(PROGRESS_INFINITE)

@@ -22,6 +22,7 @@ import com.lollipop.mediaflow.page.flow.MediaFlowStoreView
 import com.lollipop.mediaflow.page.flow.VideoPlayHolder
 import com.lollipop.mediaflow.tools.ArchiveHelper
 import com.lollipop.mediaflow.tools.MediaPlayLauncher
+import com.lollipop.mediaflow.tools.PIPHelper
 import com.lollipop.mediaflow.ui.BasicFlowActivity
 import com.lollipop.mediaflow.video.VideoManager
 import kotlin.math.max
@@ -182,6 +183,7 @@ class VideoFlowActivity : BasicFlowActivity(), VideoPlayHolder.VideoTouchDisplay
         mediaParams.onSelected(this, position)
         if (position < 0 || position >= mediaData.size) {
             updateTitle(titleValue = "", size = "", format = "", duration = "")
+            PIPHelper.setParams(this, null)
         } else {
             val file = mediaData[position]
             onSideSelected(file, position)
@@ -192,6 +194,7 @@ class VideoFlowActivity : BasicFlowActivity(), VideoPlayHolder.VideoTouchDisplay
                     format = file.suffix.uppercase(),
                     duration = it?.durationFormat ?: ""
                 )
+                PIPHelper.setParams(this, it)
             }
             if (job != null) {
                 updateTitle(file.name, size = "", format = "", duration = "")
@@ -200,6 +203,16 @@ class VideoFlowActivity : BasicFlowActivity(), VideoPlayHolder.VideoTouchDisplay
 
         optHolderHolder(position) { holder ->
             onFocusChanged(holder, position)
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        optCurrentHolder { holder ->
+            holder.onPipChanged(isInPictureInPictureMode)
         }
     }
 

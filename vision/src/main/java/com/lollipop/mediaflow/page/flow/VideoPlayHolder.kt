@@ -24,19 +24,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
+import com.lollipop.common.tools.ClickHelper
+import com.lollipop.common.tools.LLog.Companion.registerLog
+import com.lollipop.common.tools.task
+import com.lollipop.common.ui.view.DeconstructSlider
 import com.lollipop.mediaflow.R
 import com.lollipop.mediaflow.data.ArchiveManager
 import com.lollipop.mediaflow.data.ArchiveQuick
 import com.lollipop.mediaflow.data.MediaInfo
 import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.databinding.PageVideoFlowBinding
-import com.lollipop.common.tools.ClickHelper
-import com.lollipop.common.tools.LLog.Companion.registerLog
 import com.lollipop.mediaflow.tools.Preferences
 import com.lollipop.mediaflow.tools.VideoTouchHelper
-import com.lollipop.common.tools.task
-import com.lollipop.common.ui.view.DeconstructSlider
 import com.lollipop.mediaflow.ui.CoverLoader
+import com.lollipop.mediaflow.ui.PipVisibleFilter
 import com.lollipop.mediaflow.video.VideoController
 import com.lollipop.mediaflow.video.VideoListener
 import com.lollipop.mediaflow.video.VideoTrackGroup
@@ -88,8 +89,6 @@ class VideoPlayHolder(
         get() {
             return binding.playerView
         }
-
-    private var isControlVisibility = false
 
     private var lastChangeTime = 0L
     private var isSliderTouched = false
@@ -192,6 +191,8 @@ class VideoPlayHolder(
             }
         }
     }
+
+    private val controllerVisibleFilter = PipVisibleFilter(binding.controlLayout)
 
     private fun changeState(tag: String, state: VideoState) {
         val oldState = this.videoState
@@ -442,9 +443,12 @@ class VideoPlayHolder(
     }
 
     private fun updateControlVisibility(visible: Boolean) {
-        binding.controlLayout.isVisible = visible
+        controllerVisibleFilter.base.setVisible(visible)
         changeDecorationCallback?.changeDecorationVisibility(visible)
-        isControlVisibility = visible
+    }
+
+    fun onPipChanged(isInPictureInPictureMode: Boolean) {
+        controllerVisibleFilter.onPipChanged(isInPictureInPictureMode)
     }
 
     private fun onClick(clickCount: Int) {
@@ -455,7 +459,7 @@ class VideoPlayHolder(
         when (clickCount) {
             1 -> {
                 // 点击一次
-                updateControlVisibility(!isControlVisibility)
+                updateControlVisibility(!controllerVisibleFilter.base.isVisible)
                 log.i("onClick clickCount == 1")
             }
 

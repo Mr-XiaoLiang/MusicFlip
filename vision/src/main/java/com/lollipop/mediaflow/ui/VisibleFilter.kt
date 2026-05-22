@@ -2,6 +2,7 @@ package com.lollipop.mediaflow.ui
 
 import android.view.View
 import androidx.core.view.isVisible
+import com.lollipop.common.ui.page.PageOrientation
 
 open class VisibleFilter(val targetView: View) {
 
@@ -57,6 +58,18 @@ open class PreferenceVisibleFilter(
     preferenceValue: Boolean = true
 ) : VisibleFilter(targetView) {
     val preference = pair(preferenceValue)
+}
+
+open class PipVisibleFilter(
+    targetView: View,
+) : PreferenceVisibleFilter(targetView) {
+
+    val isPip = pair(true)
+
+    fun onPipChanged(isPip: Boolean) {
+        this.isPip.setVisible(!isPip)
+    }
+
 }
 
 sealed class VisibleFilterGroup(val targetView: View) {

@@ -40,7 +40,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
     }
 
     private val backBtnVisibleFilter by lazy {
-        PreferenceVisibleFilter(basicBinding.backBtn)
+        PipVisibleFilter(basicBinding.backBtn)
     }
 
     protected val menuBarVisibleFilter by lazy {
@@ -48,7 +48,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
     }
 
     private val sidePanelBtnVisibleFilter by lazy {
-        PreferenceVisibleFilter(basicBinding.sidePanelBtn).also {
+        PipVisibleFilter(basicBinding.sidePanelBtn).also {
             menuBarVisibleFilter.register(it)
         }
     }
@@ -60,17 +60,17 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
     }
 
     private val menuBtnVisibleFilter by lazy {
-        PreferenceVisibleFilter(basicBinding.menuBtn).also {
+        PipVisibleFilter(basicBinding.menuBtn).also {
             menuBarVisibleFilter.register(it)
         }
     }
 
     private val titleVisibleFilter by lazy {
-        PreferenceVisibleFilter(basicBinding.titleView)
+        PipVisibleFilter(basicBinding.titleView)
     }
 
     private val tagVisibleFilter by lazy {
-        PreferenceVisibleFilter(basicBinding.tagGroup)
+        PipVisibleFilter(basicBinding.tagGroup)
     }
 
     private val contentInsetsHelper = GuidelineInsetsHelper()
@@ -310,6 +310,19 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
         }
     }
 
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        backBtnVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        titleVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        tagVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        sidePanelBtnVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        fullscreenBtnVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        menuBtnVisibleFilter.onPipChanged(isInPictureInPictureMode)
+    }
+
     protected abstract fun onDrawerChanged(isOpen: Boolean)
 
     protected abstract fun createDrawerPanel(): View
@@ -318,7 +331,7 @@ abstract class BasicFlowActivity : CustomOrientationActivity() {
 
     protected class FullscreenBtnVisibleFilter(
         targetView: View,
-    ) : PreferenceVisibleFilter(targetView) {
+    ) : PipVisibleFilter(targetView) {
 
         val orientation = pair(true)
 

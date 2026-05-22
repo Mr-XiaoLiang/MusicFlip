@@ -8,17 +8,18 @@ import android.view.ViewGroup
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.lollipop.common.ui.page.CustomOrientationActivity
+import com.lollipop.common.ui.page.GuidelineInsetsHelper
+import com.lollipop.common.ui.page.PageOrientation
+import com.lollipop.common.ui.view.BlurHelper
 import com.lollipop.mediaflow.data.ArchiveQuick
 import com.lollipop.mediaflow.data.MediaLoader
 import com.lollipop.mediaflow.data.MetadataLoader
 import com.lollipop.mediaflow.databinding.ActivityVideoQuickPlayBinding
 import com.lollipop.mediaflow.page.flow.VideoPlayHolder
+import com.lollipop.mediaflow.tools.PIPHelper
 import com.lollipop.mediaflow.tools.Preferences
-import com.lollipop.common.ui.view.BlurHelper
-import com.lollipop.common.ui.page.CustomOrientationActivity
-import com.lollipop.common.ui.page.GuidelineInsetsHelper
-import com.lollipop.common.ui.page.PageOrientation
-import com.lollipop.mediaflow.ui.PreferenceVisibleFilter
+import com.lollipop.mediaflow.ui.PipVisibleFilter
 import com.lollipop.mediaflow.video.VideoManager
 import kotlinx.coroutines.launch
 
@@ -31,15 +32,15 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
     }
 
     private val backBtnVisibleFilter by lazy {
-        PreferenceVisibleFilter(binding.backBtn)
+        PipVisibleFilter(binding.backBtn)
     }
 
     private val titleVisibleFilter by lazy {
-        PreferenceVisibleFilter(binding.titleView)
+        PipVisibleFilter(binding.titleView)
     }
 
     private val tagVisibleFilter by lazy {
-        PreferenceVisibleFilter(binding.tagGroup)
+        PipVisibleFilter(binding.tagGroup)
     }
 
     private val videoHolder by lazy {
@@ -89,6 +90,7 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
                         format = mediaFile.suffix.uppercase(),
                         duration = metadata?.durationFormat ?: ""
                     )
+                    PIPHelper.setParams(this@VideoQuickPlayActivity, metadata)
                 }
                 videoManager.resetMediaList(listOf(mediaFile))
                 videoHolder.onBind(mediaFile)
@@ -101,6 +103,17 @@ class VideoQuickPlayActivity : CustomOrientationActivity(), VideoPlayHolder.Vide
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         updateBlur()
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        backBtnVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        titleVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        tagVisibleFilter.onPipChanged(isInPictureInPictureMode)
+        videoHolder.onPipChanged(isInPictureInPictureMode)
     }
 
     private fun updateBlur() {

@@ -179,15 +179,29 @@ class VideoManager(
 
     private fun seekWithDelta(weight: Float) {
         // 计算目标位置：起始位置 + (权重 * 总时长)
-        val targetPosition = touchSeekStartPosition + (weight * exoPlayer.duration).toLong()
+        val duration = exoPlayer.duration
+        if (duration < 0) {
+            log.i("seekWithDelta duration < 0, break")
+            return
+        }
+        val targetPosition = touchSeekStartPosition + (weight * duration).toLong()
         // 限制在 [0, duration] 范围内
-        val coercedPosition = targetPosition.coerceIn(0, exoPlayer.duration)
+        val coercedPosition = targetPosition.coerceIn(0, duration)
         // 快速预览寻道
         exoPlayer.seekTo(coercedPosition)
         eventObserver.notifyProgressUpdate()
     }
 
     override fun seekTo(ms: Long) {
+        val duration = exoPlayer.duration
+        if (duration < 0) {
+            log.w("seekTo duration < 0, break")
+            return
+        }
+        if (ms < 0 || ms > duration) {
+            log.w("seekTo ms < 0 || ms > duration, break")
+            return
+        }
         log.i("seekTo: $ms")
         exoPlayer.seekTo(ms)
     }

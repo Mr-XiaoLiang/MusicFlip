@@ -226,7 +226,9 @@ class VideoManager(
     }
 
     private fun onStop() {
-
+        if (isPlaying()) {
+            pause()
+        }
     }
 
     private fun onDestroy() {

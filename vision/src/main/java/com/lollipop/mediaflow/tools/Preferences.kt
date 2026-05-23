@@ -117,6 +117,13 @@ object Preferences : PreferencesBasic() {
     }
 
     /**
+     * 是否开启画中画模式
+     */
+    val isPictureInPictureEnable by lazy {
+        BooleanItem(name = "isPictureInPictureEnable", true)
+    }
+
+    /**
      * 公开视频排序
      */
     val publicVideoSort by lazy {

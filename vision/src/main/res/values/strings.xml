@@ -36,6 +36,10 @@
     <string name="label_show_other_quick_archive">显示其他归档文件夹</string>
     <string name="summary_show_other_quick_archive">在视频播放页面，是否显示未定义类型的归档文件夹</string>
 
+
+    <string name="label_picture_in_picture_enable">画中画</string>
+    <string name="summary_picture_in_picture_enable">开启后，在视频播放过程中回到桌面将会自动进入画中画模式</string>
+
     <string name="label_archive_running_task">进行中</string>
     <string name="label_archive_history_task">已完成</string>
     <string name="label_archive_drag">拖拽到此处归档</string>

@@ -20,11 +20,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.lifecycleScope
+import com.lollipop.common.tools.LLog.Companion.registerLog
+import com.lollipop.common.tools.safeRun
+import com.lollipop.common.upgrade.GithubApiModel
 import com.lollipop.mediaflow.BuildConfig
 import com.lollipop.mediaflow.R
-import com.lollipop.common.tools.LLog.Companion.registerLog
+import com.lollipop.mediaflow.page.archive.ArchiveUriManagerActivity
 import com.lollipop.mediaflow.tools.Preferences
-import com.lollipop.common.tools.safeRun
 import com.lollipop.mediaflow.ui.BasicComposeActivity
 import com.lollipop.mediaflow.ui.PreferencesDivider
 import com.lollipop.mediaflow.ui.PreferencesGroupItem
@@ -32,8 +34,6 @@ import com.lollipop.mediaflow.ui.PreferencesIntent
 import com.lollipop.mediaflow.ui.PreferencesSlide
 import com.lollipop.mediaflow.ui.PreferencesSwitch
 import com.lollipop.mediaflow.ui.theme.currentThemeColor
-import com.lollipop.common.upgrade.GithubApiModel
-import com.lollipop.mediaflow.page.archive.ArchiveUriManagerActivity
 import kotlinx.coroutines.launch
 
 
@@ -158,6 +158,8 @@ class PreferencesActivity : BasicComposeActivity() {
         val isShowBackBtn by remember { Preferences.isShowBackBtn.state }
         val isShowTitle by remember { Preferences.isShowTitle.state }
         val isShowTag by remember { Preferences.isShowTag.state }
+
+        val isPictureInPictureEnable by remember { Preferences.isPictureInPictureEnable.state }
 
         ContentColumn(
             innerPadding = innerPadding,
@@ -322,6 +324,15 @@ class PreferencesActivity : BasicComposeActivity() {
                     Preferences.isBlurVideoBackground.set(it)
                 }
 
+                PreferencesDivider()
+
+                PreferencesSwitch(
+                    name = stringResource(id = R.string.label_picture_in_picture_enable),
+                    summary = stringResource(id = R.string.summary_picture_in_picture_enable),
+                    isChecked = isPictureInPictureEnable
+                ) {
+                    Preferences.isPictureInPictureEnable.set(it)
+                }
             }
 
             PreferencesGroupItem {

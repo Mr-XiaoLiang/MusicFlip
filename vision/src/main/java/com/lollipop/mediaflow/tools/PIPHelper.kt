@@ -30,6 +30,9 @@ object PIPHelper {
     }
 
     fun setParams(activity: Activity, width: Int, height: Int) {
+        if (!Preferences.isPictureInPictureEnable.get()) {
+            return
+        }
         // 1. 防止极端比例崩溃，Android 限制比例必须在 1:2.39 到 2.39:1 之间
         val rawRatio = width.toFloat() / height.toFloat()
         val finalRatio = when {

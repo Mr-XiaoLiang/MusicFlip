@@ -139,6 +139,27 @@ object Preferences : PreferencesBasic() {
     }
 
     /**
+     * 画中画模式下是否开启上一曲按钮
+     */
+    val isPipPrevEnable by lazy {
+        BooleanItem(name = "isPipPrevEnable", true)
+    }
+
+    /**
+     * 画中画模式下是否开启下一曲按钮
+     */
+    val isPipNextEnable by lazy {
+        BooleanItem(name = "isPipNextEnable", true)
+    }
+
+    /**
+     * 画中画模式下是否开启播放按钮
+     */
+    val isPipPlayEnable by lazy {
+        BooleanItem(name = "isPipPlayEnable", true)
+    }
+
+    /**
      * 公开视频排序
      */
     val publicVideoSort by lazy {

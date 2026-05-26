@@ -65,16 +65,18 @@ object PIPHelper {
 
         val actionList = mutableListOf<RemoteAction>()
         if (option != null) {
-            if (option.hasPrev) {
+            if (option.hasPrev && Preferences.isPipPrevEnable.get()) {
                 actionList.add(Action.PREVIOUS.createRemoteAction(activity))
             }
-            // 这里只能二选一，play 和 pause 不能同时存在
-            if (option.hasPlay) {
-                actionList.add(Action.PLAY.createRemoteAction(activity))
-            } else if (option.hasPause) {
-                actionList.add(Action.PAUSE.createRemoteAction(activity))
+            if (Preferences.isPipPlayEnable.get()) {
+                // 这里只能二选一，play 和 pause 不能同时存在
+                if (option.hasPlay) {
+                    actionList.add(Action.PLAY.createRemoteAction(activity))
+                } else if (option.hasPause) {
+                    actionList.add(Action.PAUSE.createRemoteAction(activity))
+                }
             }
-            if (option.hasNext) {
+            if (option.hasNext && Preferences.isPipNextEnable.get()) {
                 actionList.add(Action.NEXT.createRemoteAction(activity))
             }
         }

@@ -40,6 +40,15 @@
     <string name="label_picture_in_picture_enable">画中画</string>
     <string name="summary_picture_in_picture_enable">开启后，在视频播放过程中回到桌面将会自动进入画中画模式</string>
 
+    <string name="label_pip_button_skip_previous_enable">显示上一曲按钮</string>
+    <string name="summary_pip_button_skip_previous_enable">在画中画模式中，显示上一曲按钮</string>
+
+    <string name="label_pip_button_play_enable">显示播放按钮</string>
+    <string name="summary_pip_button_play_enable">在画中画模式中，显示播放按钮</string>
+
+    <string name="label_pip_button_skip_next_enable">显示下一曲按钮</string>
+    <string name="summary_pip_button_skip_next_enable">在画中画模式中，显示下一曲按钮</string>
+
     <string name="label_archive_running_task">进行中</string>
     <string name="label_archive_history_task">已完成</string>
     <string name="label_archive_drag">拖拽到此处归档</string>

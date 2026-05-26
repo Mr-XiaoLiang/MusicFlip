@@ -161,6 +161,9 @@ class PreferencesActivity : BasicComposeActivity() {
         val isShowTag by remember { Preferences.isShowTag.state }
 
         val isPictureInPictureEnable by remember { Preferences.isPictureInPictureEnable.state }
+        val isPipPrevEnable by remember { Preferences.isPipPrevEnable.state }
+        val isPipPlayEnable by remember { Preferences.isPipPlayEnable.state }
+        val isPipNextEnable by remember { Preferences.isPipNextEnable.state }
 
         ContentColumn(
             innerPadding = innerPadding,
@@ -333,7 +336,9 @@ class PreferencesActivity : BasicComposeActivity() {
                     Preferences.isBlurVideoBackground.set(it)
                 }
 
-                PreferencesDivider()
+            }
+
+            PreferencesGroupItem {
 
                 PreferencesSwitch(
                     name = stringResource(id = R.string.label_picture_in_picture_enable),
@@ -342,6 +347,37 @@ class PreferencesActivity : BasicComposeActivity() {
                 ) {
                     Preferences.isPictureInPictureEnable.set(it)
                 }
+
+                PreferencesDivider()
+
+                PreferencesSwitch(
+                    name = stringResource(id = R.string.label_pip_button_skip_previous_enable),
+                    summary = stringResource(id = R.string.summary_pip_button_skip_previous_enable),
+                    isChecked = isPipPrevEnable
+                ) {
+                    Preferences.isPipPrevEnable.set(it)
+                }
+
+                PreferencesDivider()
+
+                PreferencesSwitch(
+                    name = stringResource(id = R.string.label_pip_button_play_enable),
+                    summary = stringResource(id = R.string.summary_pip_button_play_enable),
+                    isChecked = isPipPlayEnable
+                ) {
+                    Preferences.isPipPlayEnable.set(it)
+                }
+
+                PreferencesDivider()
+
+                PreferencesSwitch(
+                    name = stringResource(id = R.string.label_pip_button_skip_next_enable),
+                    summary = stringResource(id = R.string.summary_pip_button_skip_next_enable),
+                    isChecked = isPipNextEnable
+                ) {
+                    Preferences.isPipNextEnable.set(it)
+                }
+
             }
 
             PreferencesGroupItem {

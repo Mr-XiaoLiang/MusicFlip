@@ -24,7 +24,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MediaFlow"
-include(":vision")
+rootProject.name = "MusicFlip"
 include(":common")
 include(":auditory")

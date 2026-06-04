@@ -11,7 +11,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/auditory" />
             <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/vision" />
           </set>
         </option>
       </GradleProjectSettings>

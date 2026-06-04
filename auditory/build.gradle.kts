@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.lollipop.auditory"
+        applicationId = "com.lollipop.musicflow"
         minSdk = 31
         targetSdk = 36
         versionCode = 1
@@ -46,4 +46,8 @@ dependencies {
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.palette.ktx)
     implementation(libs.material)
+
+    implementation(libs.androidx.compose.adaptive)
+    implementation(libs.androidx.compose.adaptive.layout)
+    implementation(libs.androidx.compose.adaptive.navigation)
 }

@@ -1,5 +1,5 @@
 [versions]
-agp = "9.1.1"
+agp = "9.2.1"
 blurview = "version-3.2.0"
 coreKtx = "1.17.0"
 documentfile = "1.1.0"
@@ -22,6 +22,9 @@ window = "1.5.1"
 paletteKtx = "1.0.0"
 
 [libraries]
+androidx-compose-adaptive = { module = "androidx.compose.material3.adaptive:adaptive" }
+androidx-compose-adaptive-layout = { module = "androidx.compose.material3.adaptive:adaptive-layout" }
+androidx-compose-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation" }
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

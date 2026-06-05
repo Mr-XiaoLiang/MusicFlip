@@ -2,16 +2,16 @@ package com.lollipop.auditory.audio
 
 interface AudioListener {
 
-    fun onAudioBegin()
+    fun onAudioBegin() {}
 
-    fun onAudioProgress(ms: Long)
+    fun onAudioProgress(ms: Long) {}
 
-    fun onPlay()
+    fun onPlay() {}
 
-    fun onPause()
+    fun onPause() {}
 
-    fun onAudioEnd()
+    fun onAudioEnd() {}
 
-    fun onPlayerError(msg: String)
+    fun onPlayerError(msg: String) {}
 
 }

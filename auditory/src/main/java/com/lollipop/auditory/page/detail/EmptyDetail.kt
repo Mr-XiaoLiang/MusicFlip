@@ -1,4 +1,4 @@
-package com.lollipop.auditory.page
+package com.lollipop.auditory.page.detail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues

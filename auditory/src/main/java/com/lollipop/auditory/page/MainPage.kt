@@ -15,6 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.lollipop.auditory.page.detail.AboutDetail
+import com.lollipop.auditory.page.detail.AlbumDetail
+import com.lollipop.auditory.page.detail.ArtistsDetail
+import com.lollipop.auditory.page.detail.EmptyDetail
+import com.lollipop.auditory.page.detail.SettingsDetail
+import com.lollipop.auditory.page.detail.SongsDetail
+import com.lollipop.auditory.page.detail.TodayDetail
 import com.lollipop.auditory.router.DetailAnimatedPaneScope
 import com.lollipop.auditory.router.DetailPane
 import com.lollipop.auditory.router.DetailPaneNavigator
@@ -47,12 +54,13 @@ fun MainPage(innerPadding: PaddingValues) {
             defaultBackBehavior = BackNavigationBehavior.PopLatest,
             listPane = {
                 AnimatedPane {
-                    HomePage(
-                        innerPadding = innerPadding,
-                        navigator = navigator,
-                        sharedTransitionScope = this@SharedTransitionLayout,
-                        animatedVisibilityScope = this@AnimatedPane
-                    )
+                    CompositionLocalProvider(
+                        DetailPaneRouter provides detailRouter,
+                        DetailSharedPaneScope provides this@SharedTransitionLayout,
+                        DetailAnimatedPaneScope provides this@AnimatedPane
+                    ) {
+                        HomePage(innerPadding = innerPadding)
+                    }
                 }
             },
             detailPane = {
@@ -93,6 +101,30 @@ private fun DetailPaneDispatcher(
     when (paneKey) {
         DetailPane.Empty -> {
             EmptyDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.Settings -> {
+            SettingsDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.Today -> {
+            TodayDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.Album -> {
+            AlbumDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.Artists -> {
+            ArtistsDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.Songs -> {
+            SongsDetail(innerPadding = innerPadding)
+        }
+
+        DetailPane.About -> {
+            AboutDetail(innerPadding = innerPadding)
         }
     }
 }

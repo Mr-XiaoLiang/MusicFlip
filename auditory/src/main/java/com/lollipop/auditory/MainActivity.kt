@@ -12,14 +12,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -156,22 +164,41 @@ class MainActivity : AuditoryBasicActivity() {
             setContent {
                 val playerPeekHeight by remember { model.theme.playerPeekHeight }
                 MediaFlowTheme {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                    ) { innerPadding ->
                         val currentDensity = LocalDensity.current
                         val currentDirection = LocalLayoutDirection.current
+                        val cutoutPadding = rememberLiveCutoutPadding()
                         // 确保发生变化的时候，Insets 会被重新计算
                         val finalPadding = remember(
                             innerPadding,
                             playerPeekHeight,
                             currentDensity,
-                            currentDirection
+                            currentDirection,
+                            cutoutPadding
                         ) {
                             val playerPeekDp = with(currentDensity) { playerPeekHeight.toDp() }
                             PaddingValues(
-                                top = innerPadding.calculateTopPadding(),
-                                bottom = max(playerPeekDp, innerPadding.calculateBottomPadding()),
-                                start = innerPadding.calculateStartPadding(currentDirection),
-                                end = innerPadding.calculateEndPadding(currentDirection)
+                                top = max(
+                                    innerPadding.calculateTopPadding(),
+                                    cutoutPadding.calculateTopPadding()
+                                ),
+                                bottom = max(
+                                    max(
+                                        playerPeekDp,
+                                        innerPadding.calculateBottomPadding()
+                                    ),
+                                    cutoutPadding.calculateBottomPadding()
+                                ),
+                                start = max(
+                                    innerPadding.calculateStartPadding(currentDirection),
+                                    cutoutPadding.calculateStartPadding(currentDirection)
+                                ),
+                                end = max(
+                                    innerPadding.calculateEndPadding(currentDirection),
+                                    cutoutPadding.calculateEndPadding(currentDirection)
+                                )
                             )
                         }
                         CompositionLocalProvider(
@@ -254,6 +281,50 @@ class MainActivity : AuditoryBasicActivity() {
         bottom: Int
     ) {
     }
+
+    @Composable
+    private fun rememberLiveCutoutPadding(): PaddingValues {
+        val view = LocalView.current
+        val density = LocalDensity.current
+        val direction = LocalLayoutDirection.current
+
+        // 状态保持
+        var cutoutPadding by remember { mutableStateOf(PaddingValues(0.dp)) }
+
+        DisposableEffect(view) {
+            ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+                // 拿到 androidx 兼容包里的 displayCutout
+                val cutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+                val isRtl = direction == LayoutDirection.Rtl
+                with(density) {
+                    cutoutPadding = PaddingValues(
+                        start = if (isRtl) {
+                            cutout.right.toDp()
+                        } else {
+                            cutout.left.toDp()
+                        },
+                        top = cutout.top.toDp(),
+                        end = if (isRtl) {
+                            cutout.left.toDp()
+                        } else {
+                            cutout.right.toDp()
+                        },
+                        bottom = cutout.bottom.toDp()
+                    )
+                }
+                // 必须返回原 insets，不要消费它，避免影响页面其他组件
+                insets
+            }
+
+            onDispose {
+                ViewCompat.setOnApplyWindowInsetsListener(view, null)
+            }
+        }
+
+
+        return cutoutPadding
+    }
+
 
     private class SheetPanelGroup(
         val panels: Array<BasicSheetPanel>,

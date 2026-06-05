@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.lollipop.musicflow"
+        applicationId = "com.lollipop.musicflip"
         minSdk = 31
         targetSdk = 36
         versionCode = 1

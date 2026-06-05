@@ -2,6 +2,7 @@ package com.lollipop.auditory.data
 
 import android.content.ContentUris
 import android.provider.MediaStore
+import com.lollipop.auditory.ui.MonetColor
 
 class AudioInfo(
     /**
@@ -89,6 +90,14 @@ class AudioInfo(
      */
     val displayName: String by lazy {
         audioTitle.ifBlank { fileName }
+    }
+
+    val lightMonet by lazy {
+        MonetColor.generateMonetColors(null, titleHash, false)
+    }
+
+    val darkMonet by lazy {
+        MonetColor.generateMonetColors(null, titleHash, true)
     }
 
     companion object {
